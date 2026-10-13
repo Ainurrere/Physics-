@@ -1,0 +1,928 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Шайба и подвижная горка · 18878</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* ═══ ОБЩИЙ СТИЛЬ: палитра, типографика, компоненты. Не менять. ═══ */
+:root{
+  --bg:#f5f5f7; --surface:#ffffff; --inset:#f0f0f3; --seg-on:#ffffff;
+  --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#a1a1a6; --hair:rgba(0,0,0,.08);
+  --green:#199A42; --green-hi:#3ccb6b; --green-lo:#0e7a30; --green-text:#0f7a32; --green-fill:#199A42;
+  --orange:#FF862F; --orange-ink:#c2560c; --blue:#0071e3;
+  --violet:#7b4fd6; --violet-hi:#b196f5; --violet-lo:#5631b3; --violet-ink:#6336c9;
+  --stage-a:#fdfdfe; --stage-b:#e9e9ee;
+  --slab-a:#f4f4f7; --slab-b:#c6c6cf; --slab-edge:rgba(0,0,0,.16);
+  --thumb:#ffffff; --cv-shadow:rgba(0,0,0,.2);
+  --shadow:0 1px 2px rgba(0,0,0,.04),0 12px 32px rgba(0,0,0,.06);
+  --ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Inter","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --num:ui-rounded,"SF Pro Rounded",-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter","Segoe UI",Roboto,Arial,sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#000000; --surface:#1c1c1e; --inset:#2c2c2e; --seg-on:#636366;
+  --ink:#f5f5f7; --ink-2:#a1a1a6; --ink-3:#6e6e73; --hair:rgba(255,255,255,.1);
+  --green:#2fbf5b; --green-hi:#63dd88; --green-lo:#15803a; --green-text:#4fd47c; --green-fill:#199A42;
+  --orange:#ff9340; --orange-ink:#ffa35c; --blue:#2997ff;
+  --violet:#a78bfa; --violet-hi:#d3c5ff; --violet-lo:#7453d8; --violet-ink:#c2adff;
+  --stage-a:#242427; --stage-b:#101012;
+  --slab-a:#74747a; --slab-b:#3f3f44; --slab-edge:rgba(255,255,255,.18);
+  --thumb:#f2f2f7; --cv-shadow:rgba(0,0,0,.55);
+  --shadow:0 0 0 1px rgba(255,255,255,.06);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#000000; --surface:#1c1c1e; --inset:#2c2c2e; --seg-on:#636366;
+  --ink:#f5f5f7; --ink-2:#a1a1a6; --ink-3:#6e6e73; --hair:rgba(255,255,255,.1);
+  --green:#2fbf5b; --green-hi:#63dd88; --green-lo:#15803a; --green-text:#4fd47c; --green-fill:#199A42;
+  --orange:#ff9340; --orange-ink:#ffa35c; --blue:#2997ff;
+  --violet:#a78bfa; --violet-hi:#d3c5ff; --violet-lo:#7453d8; --violet-ink:#c2adff;
+  --stage-a:#242427; --stage-b:#101012;
+  --slab-a:#74747a; --slab-b:#3f3f44; --slab-edge:rgba(255,255,255,.18);
+  --thumb:#f2f2f7; --cv-shadow:rgba(0,0,0,.55);
+  --shadow:0 0 0 1px rgba(255,255,255,.06);
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.45;
+  -webkit-font-smoothing:antialiased;padding-inline:20px;padding-block:18px 48px}
+:focus-visible{outline:3px solid color-mix(in srgb,var(--blue) 60%,transparent);outline-offset:2px}
+.vh{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+
+/* шапка: логотип слева, ссылка на телеграм справа */
+.top{display:flex;align-items:center;justify-content:space-between;gap:16px;min-width:0}
+.logo svg{display:block;height:34px;width:auto;color:var(--ink)}
+.tg{display:inline-flex;align-items:center;padding:8px 14px 8px 8px;border-radius:999px;background:var(--surface);
+  box-shadow:var(--shadow);color:var(--ink);text-decoration:none;transition:transform .2s ease}
+.tg svg{display:block;height:26px;width:auto}
+.tg:hover{transform:translateY(-1px)}
+
+.card{background:var(--surface);border-radius:28px;box-shadow:var(--shadow);padding:22px;min-width:0}
+h2{margin:0;font-size:21px;line-height:1.2;font-weight:600;letter-spacing:-.012em}
+
+/* сцена: холст, поверх него подписи (HTML), часы */
+.stage-card{padding:10px}
+.stage{position:relative;min-width:0;border-radius:20px;overflow:hidden;background:linear-gradient(var(--stage-a),var(--stage-b))}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;
+  -webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+.labels{position:absolute;inset:0;pointer-events:none}
+.lab{position:absolute;left:0;top:0;white-space:nowrap;font-size:16px;line-height:1.25;display:flex;align-items:baseline;gap:.32em;will-change:transform}
+.lab .val{font-family:var(--num);font-weight:600;font-size:14px;font-variant-numeric:tabular-nums}
+.lab.chip{padding:3px 10px 4px;border-radius:999px;background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.06),0 4px 14px rgba(0,0,0,.08)}
+.lab.dim{color:var(--ink)}              /* размеры и время */
+.lab.b1{color:var(--green-text)}        /* первое тело */
+.lab.b2{color:var(--violet-ink)}        /* второе тело */
+.lab.bu{color:var(--ink)}               /* общее, итог */
+.lab.f{color:var(--orange-ink)}         /* силы */
+.lab.a{color:var(--blue)}               /* ускорения */
+.clock{position:absolute;right:18px;top:10px;font-family:var(--num);font-variant-numeric:tabular-nums;
+  font-size:clamp(34px,4.4vw,46px);font-weight:600;letter-spacing:-.02em;line-height:1.1}
+.clock small{font-size:.42em;font-weight:500;color:var(--ink-2);margin-left:.22em;letter-spacing:0}
+
+/* шкала времени под сценой: риски и подписи главных моментов */
+.tl{position:relative;padding:8px 10px 26px;--tint:var(--ink)}
+.tl input{position:relative;display:block}
+.tlm{position:absolute;left:10px;right:10px;top:8px;height:30px;pointer-events:none}
+.tm{position:absolute;top:0;left:calc(12px + var(--x) * (100% - 24px))}
+.tm i{position:absolute;left:-1px;top:21px;width:2px;height:6px;border-radius:1px;background:var(--ink-3)}
+.tm b{position:absolute;top:30px;left:0;transform:translateX(-50%);white-space:nowrap;padding:2px 6px;border-radius:8px;
+  font-size:12px;line-height:1.3;font-weight:600;color:var(--ink-2);pointer-events:auto;cursor:pointer}
+.tm b:hover{background:var(--inset);color:var(--ink)}
+.tm b:empty{display:none}
+.tm.key i{left:-1.5px;width:3px;height:7px;border-radius:1.5px;background:var(--orange)}
+.tm.key b{color:var(--ink)}
+.tm.start b{transform:none;left:-14px}
+.tm.left b{transform:translateX(-100%);left:14px}
+.tm.end b{transform:translateX(-100%);left:18px}
+
+/* кнопки под сценой */
+.bar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px 8px 6px;min-width:0}
+.bar .sp{flex:1 1 0}
+.btn{appearance:none;border:0;font:inherit;font-size:15px;font-weight:600;height:44px;padding:0 18px 0 14px;border-radius:999px;
+  background:var(--inset);color:var(--ink);display:inline-flex;align-items:center;gap:7px;cursor:pointer;
+  transition:transform .15s ease,opacity .2s}
+.btn svg{width:18px;height:18px;flex:none}
+.btn:active{transform:scale(.97)}
+.btn.primary{background:var(--green-fill);color:#ffffff;min-width:132px}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.sm{height:38px;font-size:14px;padding:0 14px;gap:8px}
+.btn.tog::before{content:"";flex:none;width:9px;height:9px;border-radius:50%;border:2px solid currentColor;opacity:.6}
+.btn.tog[aria-pressed="true"]{background:color-mix(in srgb,var(--green) 16%,transparent);color:var(--green-text)}
+.btn.tog[aria-pressed="true"]::before{background:currentColor;opacity:1}
+.seg{display:inline-flex;padding:3px;border-radius:999px;background:var(--inset)}
+.seg button{appearance:none;border:0;background:transparent;font:inherit;font-size:14px;font-weight:500;color:var(--ink-2);
+  height:38px;padding:0 14px;border-radius:999px;cursor:pointer;white-space:nowrap;transition:background .2s,color .2s;font-variant-numeric:tabular-nums}
+.seg button[aria-checked="true"]{background:var(--seg-on);color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.14),0 0 0 .5px rgba(0,0,0,.05)}
+
+/* параметр: подпись, числовое поле, под ними слайдер */
+.prm{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:2px 12px;padding:11px 0 7px;min-width:0}
+.prm label{font-size:15px;color:var(--ink-2);display:flex;align-items:baseline;gap:.4em;min-width:0}
+.prm label .tex{color:var(--ink)}
+.prm output{font-family:var(--num);font-size:17px;font-weight:600;font-variant-numeric:tabular-nums}
+.prm input[type=range]{grid-column:1/-1}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:30px;margin:0;background:transparent;cursor:pointer;--p:50%}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:2px;
+  background:linear-gradient(to right,var(--tint,var(--ink)) var(--p),var(--inset) var(--p))}
+input[type=range]::-moz-range-track{height:4px;border-radius:2px;background:var(--inset)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:2px;background:var(--tint,var(--ink))}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;margin-top:-10px;border-radius:50%;
+  background:var(--thumb);box-shadow:0 0 0 .5px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.2)}
+input[type=range]::-moz-range-thumb{width:24px;height:24px;border:0;border-radius:50%;
+  background:var(--thumb);box-shadow:0 0 0 .5px rgba(0,0,0,.1),0 3px 8px rgba(0,0,0,.2)}
+.nf{display:inline-flex;align-items:baseline;gap:5px;height:36px;line-height:36px;padding:0 10px;border-radius:11px;background:var(--inset);
+  cursor:text;transition:box-shadow .15s}
+.nf:focus-within{box-shadow:0 0 0 2px color-mix(in srgb,var(--blue) 70%,transparent)}
+.nf input{appearance:none;border:0;margin:0;padding:0;background:transparent;color:var(--ink);font-family:var(--num);font-size:16px;font-weight:600;
+  font-variant-numeric:tabular-nums;line-height:36px;height:36px;width:4ch;min-width:0;text-align:right;outline:0}
+.nf input:disabled{opacity:.45}
+.nf .u{font-size:14px;color:var(--ink-2)}
+
+/* формулы: группа = цветная точка, заголовок капителью, 1–3 строки */
+.fh{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:12px;font-weight:600;letter-spacing:.07em;
+  text-transform:uppercase;color:var(--ink-2)}
+.fh i{flex:none;width:9px;height:9px;border-radius:3px}
+.fl{font-size:17px;min-height:30px;padding:4px 0;color:var(--ink-2);overflow-x:auto;overflow-y:hidden}
+.fl.res{color:var(--ink)}
+.fg.off,.fl.off{opacity:.45}
+.fnote{margin:4px 0 0;font-size:14px;line-height:1.4;color:var(--ink-2)}
+mjx-container{margin:0!important;line-height:inherit}
+.tex{display:inline-block;line-height:inherit}
+.fl.tex{display:block}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* ═══ РАСКЛАДКА «ДЛЯ ВЕБА»: шапка → заголовок → две колонки (сцена и формулы | параметры); до 980px — одна колонка ═══ */
+.page{max-width:1200px;margin:0 auto;display:flex;flex-direction:column;gap:26px}
+.hero{display:flex;flex-direction:column;gap:10px;padding-block:6px 2px}
+.eyebrow{margin:0;font-size:13px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;color:var(--green-text)}
+h1{margin:0;font-size:clamp(34px,5.4vw,58px);line-height:1.04;letter-spacing:-.028em;font-weight:700;text-wrap:balance}
+.lede{margin:0;font-size:clamp(17px,1.7vw,21px);line-height:1.38;color:var(--ink-2);max-width:40em}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 364px;gap:20px;align-items:start}
+.col{display:flex;flex-direction:column;gap:20px;min-width:0}
+/* сцена с часами, шкалой времени и кнопками целиком помещается в первый экран */
+.stage{height:clamp(380px,min(40vw,100vh - 440px),540px)}
+.pill{position:absolute;left:14px;top:14px;max-width:calc(100% - 150px);display:flex;align-items:center;gap:8px;
+  padding:8px 13px 8px 11px;border-radius:999px;font-size:14px;font-weight:500;line-height:1.2;
+  background:var(--surface);box-shadow:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.07)}
+.pill i{flex:none;width:8px;height:8px;border-radius:50%;background:var(--ink-3);transition:background .25s}
+.pill[data-s="slip"] i{background:var(--orange)}
+.pill[data-s="stick"] i{background:var(--green)}
+.prm + .prm{border-top:1px solid var(--hair)}
+.prm:first-of-type{padding-top:14px}
+.bal{margin-top:6px;padding-top:14px;border-top:1px solid var(--hair);font-size:14px;line-height:1.35;color:var(--ink-2);min-height:calc(14px + 2.7em)}
+.acts{display:flex;flex-wrap:wrap;gap:8px;padding-top:10px}
+.fg{padding:14px 0 10px}
+.fg + .fg{border-top:1px solid var(--hair)}
+.fg:last-child{padding-bottom:0}
+@media (min-width:981px){
+  /* формулы под сценой — группами в две колонки; .fg.wide занимает всю ширину, а её строки встают рядом */
+  .fcard{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:32px;align-items:start}
+  .fcard > h2{grid-column:1/-1}
+  .card.fcard .fg{border-top:0;padding:14px 0 12px}
+  .card.fcard .fg:nth-child(n+4){border-top:1px solid var(--hair)}
+  .card.fcard .fg:nth-last-child(-n+2){padding-bottom:0}
+  .card.fcard .fg.wide{grid-column:1/-1;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:32px;align-items:center}
+  .card.fcard .fg.wide .fh{grid-column:1/-1}
+}
+@media (max-width:980px){
+  /* одна колонка: сцена, параметры, формулы */
+  .grid{display:flex;flex-direction:column;align-items:stretch}
+  .grid > .col{display:contents}
+  .stage-card{order:1}
+  .grid > aside > .card{order:2}
+  .fcard{order:3}
+}
+@media (max-width:560px){
+  body{padding-inline:16px}
+  .logo svg{height:28px}
+  .tg svg{height:22px}
+  .card{padding:18px;border-radius:24px}
+  .stage-card{padding:8px}
+  .stage{border-radius:17px;height:500px}
+  .bar{padding:10px 4px 4px}
+  .bar .sp{display:none}
+  .btn{flex:1 1 0;justify-content:center}
+  .seg{flex:1 1 100%}
+  .seg button{flex:1 1 0;padding:0 6px}
+  .pill{font-size:13px;left:10px;top:10px}
+  .clock{right:12px;top:8px}
+  .lab{font-size:14px}
+  .lab .val{font-size:13px}
+}
+.calc-controls{display:grid;gap:10px;margin:18px 0}.calc-controls label{color:var(--ink-2);font-size:14px}.calc-controls select{width:100%;min-width:0;padding:12px;border-radius:12px;border:1px solid var(--hair);background:var(--stage-a);color:var(--ink);font:inherit;font-size:14px}.calc-controls option{background:var(--surface);color:var(--ink)}#calcError{color:var(--orange);font-size:14px;margin:0}.calc-result{grid-column:1/-1}.prm:has(input:disabled){opacity:.65}
+</style>
+</head>
+<body><div class="page"><header class="top">
+    <div class="logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 511.32814 92.9707" role="img" aria-label="Школково"><g><path transform="matrix(1,0,0,-1,19.296875,74.58203)" d="M27.166668 15.822266 10.755209-.000652 0 10.395182 16.364584 26.166016 27.166668 15.822266Z" fill="#1a9a42" fill-opacity=".6"/><path transform="matrix(1,0,0,-1,30.051758,87.1875)" d="M23.078125 22.047526 .052083 .00065 0 12.604817 16.416668 28.427735 23.078125 22.047526Z" fill="#1a9a42" fill-opacity=".8"/><path transform="matrix(1,0,0,-1,6.03125,64.19141)" d="M0 .051432 23.026043 22.103516 29.630209 15.775391 13.270831-.000652 0 .051432Z" fill="#1a9a42" fill-opacity=".4"/><path transform="matrix(1,0,0,-1,5.979492,87.24414)" d="M12.0625 .052083 .052084 0 0 11.5 12.0625 .052083Z" fill="#1a9a42"/><path transform="matrix(1,0,0,-1,29.046875,65.69922)" d="M26.854168 41.28711 42.53646 26.271485C44.84375 24.057942 44.84375 20.44336 42.53646 18.235026L24.072918 .552734 0 23.610026 18.463543 41.28711C20.770834 43.49544 24.546875 43.49544 26.854168 41.28711ZM18.989584 18.682942 31 18.636067 18.9375 30.18815 18.989584 18.682942Z" fill="#1a9a42" fill-rule="evenodd"/><path transform="matrix(1,0,0,-1,5.979492,87.291019)" d="M87.375 87.291019 91.09896 83.723308 78.614589 71.77018 74.890628 75.33789 87.375 87.291019ZM3.723959 87.24414 16.208334 75.291019 12.484375 71.723308 0 83.67643 3.723959 87.24414ZM78.614589 15.514969 91.09896 3.561844 87.375-.000656 74.890628 11.952469 78.614589 15.514969ZM76.583339 39.780599V45.02539H89.895839V39.780599H76.583339ZM47.28646 73.86914H41.958337V86.978519H47.28646V73.86914Z" fill="#1a9a42"/><path transform="matrix(1,0,0,-1,146.47364,65.86914)" d="M41 7.973307H30.166668V39.33789H20.432293V7.973307H9.598959V39.33789H0V-.000652H50.59896V39.33789H41V7.973307ZM133.19272 36.874349C130.40625 38.55664 126.82292 39.33789 122.708339 39.33789 118.46355 39.33789 114.88021 38.55664 112.09375 36.874349 109.3073 35.322267 107.1823 32.99414 105.859378 30.020182 104.53125 27.171223 103.864589 23.68164 103.864589 19.796223 103.864589 15.916016 104.53125 12.421223 105.859378 9.447266 107.1823 6.468098 109.3073 4.139973 112.09375 2.45768 114.88021 .775391 118.46355-.000652 122.578128-.000652 126.82292-.000652 130.40625 .775391 133.0573 2.45768 135.84375 4.139973 137.83335 6.468098 139.16147 9.317057 140.4896 12.291014 141.15105 15.6556 141.15105 19.666016 141.15105 23.551434 140.4896 27.041016 139.16147 29.889973 137.96875 32.863935 135.97917 35.197267 133.19272 36.874349ZM131.59897 19.666016C131.59897 15.916016 130.9323 12.942057 129.47397 10.869141 128.14585 8.801432 125.89063 7.895182 122.708339 7.895182 119.52605 7.895182 117.40105 8.926432 115.94271 10.869141 114.484378 12.942057 113.81771 15.916016 113.81771 19.666016 113.81771 23.421223 114.484378 26.395182 115.94271 28.468098 117.270839 30.535807 119.52605 31.572266 122.708339 31.572266 125.89063 31.572266 128.14585 30.535807 129.47397 28.598307 130.8021 26.395182 131.59897 23.421223 131.59897 19.666016ZM153.6823 10.629557C153.39585 9.171223 151.95313 8.108723 150.3698 8.108723H146.47397V.134766H153.82813C158.15625 .134766 161.90625 2.92643 162.625 6.910805L167.53125 31.363932H176.32813V-.000652H186.42188V39.33789H159.45313L153.6823 10.629557ZM268.4375 36.874349C265.45314 38.55664 261.75523 39.33789 257.20835 39.33789 252.65625 39.33789 248.81772 38.55664 245.83335 36.874349 242.84897 35.322267 240.57292 32.99414 239.15105 30.020182 237.72917 27.171223 237.02085 23.68164 237.02085 19.796223 237.02085 15.916016 237.72917 12.421223 239.15105 9.447266 240.57292 6.468098 242.84897 4.139973 245.83335 2.45768 248.81772 .775391 252.65625-.000652 257.06773-.000652 261.6146-.000652 265.45314 .775391 268.29689 2.45768 271.28126 4.139973 273.4167 6.468098 274.83335 9.317057 276.25523 12.291014 276.96876 15.6556 276.96876 19.666016 276.96876 23.551434 276.25523 27.041016 274.83335 29.889973 273.69795 32.863935 271.42189 35.197267 268.4375 36.874349ZM266.73439 19.666016C266.73439 15.916016 266.02085 12.942057 264.45835 10.869141 263.03648 8.801432 260.6198 7.895182 257.20835 7.895182 253.79688 7.895182 251.52085 8.926432 249.95835 10.869141 248.39585 12.942057 247.6823 15.916016 247.6823 19.666016 247.6823 23.421223 248.39585 26.395182 249.95835 28.468098 251.52085 30.535807 253.79688 31.442057 257.20835 31.442057 260.6198 31.442057 263.03648 30.405598 264.45835 28.468098 266.02085 26.395182 266.73439 23.421223 266.73439 19.666016ZM313.03126 19.801432C312.45314 20.197266 311.73439 20.462889 311.01564 20.733723 312.3073 21.264973 313.31773 22.061848 314.1823 23.124348 315.33335 24.7181 315.90626 26.71289 315.90626 28.968098 315.90626 32.822267 314.32295 35.483728 311.3021 37.077474 308.42189 38.53581 304.1042 39.33789 298.4896 39.33789H284.95835V-.000652H301.08335C305.97398-.000652 309.71876 1.061848 312.59898 3.056641 315.4792 5.181641 316.9167 7.973307 316.9167 11.697266 316.9167 13.822266 316.63023 15.546223 315.90626 16.74414 315.1875 18.072266 314.32295 19.134766 313.03126 19.801432ZM295.32295 16.478516H300.07295C302.6667 16.478516 304.39064 16.082682 305.25523 15.280598 306.1198 14.619139 306.5521 13.556639 306.5521 12.358723 306.5521 11.030598 306.1198 9.832682 305.25523 9.035807 304.39064 8.238932 302.6667 7.843098 300.35939 7.843098H295.32295V16.478516ZM304.39064 25.249348C303.52607 24.582682 301.94273 24.317057 299.64064 24.317057H295.32295V31.363932H299.20835C301.51564 31.363932 303.2396 31.098307 304.25 30.567057 305.1146 30.035807 305.6875 29.233725 305.6875 28.041016 305.6875 26.71289 305.25523 25.7806 304.39064 25.249348Z" fill="currentColor"/><path transform="matrix(1,0,0,-1,471.38087,65.86914)" d="M37.94271 30.020182C36.520833 32.99414 34.244794 35.322267 31.40625 36.874349 28.421875 38.55664 24.723959 39.33789 20.177084 39.33789 15.630208 39.33789 11.791667 38.55664 8.8125 36.874349 5.828125 35.322267 3.552084 32.99414 2.130208 30.020182 .708334 27.171223 0 23.68164 0 19.796223 0 15.916016 .708334 12.421223 2.130208 9.447266 3.552084 6.468098 5.828125 4.139973 8.8125 2.45768 11.791667 .775391 15.630208-.000652 20.036459-.000652 24.583334-.000652 28.421875 .775391 31.260418 2.45768 34.244794 4.139973 36.375 6.468098 37.796876 9.317057 39.218755 12.291014 39.927087 15.6556 39.927087 19.666016 40.072919 23.68164 39.359376 27.171223 37.94271 30.020182ZM29.557293 19.796223C29.557293 16.046223 28.84375 13.067057 27.28125 10.999348 25.859377 8.926432 23.447918 8.025391 20.036459 8.025391 16.625 8.025391 14.354167 9.056641 12.786459 10.999348 11.223959 13.067057 10.515625 16.046223 10.515625 19.796223 10.515625 23.551434 11.223959 26.52539 12.786459 28.598307 14.354167 30.666016 16.625 31.572266 20.036459 31.572266 23.447918 31.572266 25.859377 30.535807 27.28125 28.598307 28.84375 26.52539 29.557293 23.551434 29.557293 19.796223Z" fill="currentColor"/><path transform="matrix(1,0,0,-1,207.72949,65.86914)" d="M34.91146 39.33789H24.994793L16.338543 24.317057H9.916667V39.33789H0V-.000652H9.916667V15.014973H16.895834L25.973959-.000652H37.28646L24.296875 20.46289 34.91146 39.33789ZM170.72917 39.33789H160.8125L152.15625 24.317057H145.59375V39.33789H135.81772V-.000652H145.59375V15.014973H152.71355L161.79167-.000652H173.10417L160.1146 20.46289 170.72917 39.33789Z" fill="currentColor"/></g></svg></div>
+    <a class="tg" href="https://t.me/AV_EGE" target="_blank" rel="noopener" aria-label="Телеграм-канал @AV_EGE"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 176 48" aria-hidden="true"><path transform="matrix(1,0,0,-1,0,48)" d="M24 48C37.254838 48 47.999994 37.254838 48 24 48 10.745155 37.254846 0 24 0 10.745163 .000008 0 10.745163 0 24 .000007 37.254835 10.745168 47.999994 24 48ZM35.444337 32.39258C35.65099 34.737104 33.183427 33.79017 33.155275 33.779298 33.155275 33.779298 27.745087 31.559969 26.149415 30.86621L9.987305 24.207032C7.158567 23.103116 8.790171 22.067627 8.807617 22.05664 8.807617 22.05664 11.235559 21.224852 13.316406 20.600586 15.397332 19.976309 16.507813 20.669922 16.507813 20.669922L26.288086 27.259766C29.755867 29.61776 28.92316 27.675114 28.09082 26.842774 26.287308 25.039282 23.30453 22.195086 20.807618 19.90625 19.698786 18.935635 20.25291 18.103753 20.738282 17.6875 22.540823 16.162272 27.46205 13.043011 27.74414 12.832031 28.090962 12.554573 30.033699 11.30555 31.21289 11.583008 32.39191 11.860588 32.530275 13.456055 32.530275 13.456055L34.26465 24.345704C34.81956 28.022007 35.374975 31.42148 35.444337 32.39258Z" fill="#199a42"/><path transform="matrix(1,0,0,-1,68,24.960938)" d="M0-10.039062ZM7.104001-10.263062C6.336-10.263062 5.589334-10.167061 4.864-9.975063 4.16-9.76173 3.530667-9.44173 2.976-9.015064 2.421333-8.588394 1.984-8.055061 1.664-7.415062 1.344-6.775063 1.184-6.028397 1.184-5.175062 1.184-4.023062 1.418667-3.105728 1.888-2.423061 2.357333-1.719061 2.986667-1.185728 3.776-.823063 4.565333-.460396 5.472-.215063 6.496-.087063 7.541334 .040937 8.618667 .104939 9.728001 .104939H12.160001C12.160001 .723604 12.042667 1.267605 11.808001 1.736938 11.594667 2.227606 11.264001 2.600939 10.816001 2.856937 10.368 3.134272 9.792 3.272938 9.088 3.272938 8.64 3.272938 8.202667 3.208939 7.776 3.080938 7.370667 2.974272 7.029334 2.814272 6.752 2.600937 6.474667 2.387604 6.293334 2.110271 6.208 1.768938H1.664C1.792 2.707603 2.090667 3.507605 2.56 4.168938 3.029334 4.851604 3.616 5.406271 4.32 5.832939 5.024 6.259605 5.792 6.568939 6.624001 6.760939 7.477334 6.974272 8.352 7.080938 9.248 7.080938 11.701334 7.080938 13.514668 6.376938 14.688001 4.968937 15.861334 3.582272 16.448 1.608938 16.448-.951061V-10.039062H12.416L12.352-7.863064C11.818667-8.60973 11.210668-9.153728 10.528001-9.495064 9.866667-9.836395 9.226667-10.049728 8.608001-10.135063 7.989334-10.220394 7.488-10.263062 7.104001-10.263062ZM8.128-6.711063C8.874667-6.711063 9.557334-6.561729 10.176001-6.263062 10.794667-5.964396 11.285334-5.559063 11.648001-5.047062 12.010667-4.535063 12.192-3.959063 12.192-3.319061V-2.903063H9.120001C8.672-2.903063 8.234667-2.924397 7.808001-2.967062 7.402667-3.009729 7.029334-3.095062 6.688-3.223063 6.368-3.329729 6.112-3.511063 5.92-3.767063 5.728-4.023062 5.632-4.364395 5.632-4.791061 5.632-5.21773 5.738667-5.580397 5.952-5.879063 6.186667-6.156397 6.496-6.36973 6.88-6.519062 7.264-6.647062 7.68-6.711063 8.128-6.711063ZM18.1875-10.039062ZM24.1075-10.039062 18.1875 6.824938H23.0835L27.115502-6.391062 31.115502 6.824938H36.043504L30.1235-10.039062H24.1075ZM36.03125-10.039062ZM35.55125-15.351063V-11.415062H50.71925V-15.351063H35.55125ZM50.25-10.039062ZM59.722-10.263062C57.951337-10.263062 56.447336-9.91106 55.21-9.207062 53.972669-8.503063 53.023336-7.511063 52.362-6.231062 51.700666-4.929729 51.37-3.415062 51.37-1.687061 51.37 .062273 51.711336 1.587606 52.394 2.888939 53.076669 4.211605 54.036668 5.246271 55.274003 5.992939 56.532667 6.739605 58.01533 7.112938 59.722 7.112938 61.002 7.112938 62.121999 6.899605 63.082 6.472939 64.06333 6.046272 64.88467 5.448938 65.546 4.680939 66.22867 3.912939 66.73 3.016939 67.05 1.992939 67.391338 .990271 67.55133-.097729 67.53-1.271061 67.53-1.569729 67.51933-1.857729 67.498-2.135063 67.47667-2.412395 67.434009-2.689728 67.37-2.967062H55.818C55.882-3.607063 56.063337-4.193729 56.362-4.727062 56.660669-5.260395 57.076669-5.687061 57.61-6.007063 58.16467-6.305729 58.847337-6.455063 59.658-6.455063 60.191335-6.455063 60.682-6.40173 61.13-6.295063 61.578004-6.167063 61.962-5.975061 62.282-5.719063 62.602-5.463062 62.826-5.164396 62.954004-4.823063H67.37C67.09267-6.08173 66.57-7.116398 65.802-7.927063 65.055339-8.737728 64.14867-9.335064 63.082-9.719063 62.015336-10.08173 60.895338-10.263062 59.722-10.263062ZM55.914 .168938H63.242C63.220666 .744938 63.07133 1.278271 62.794 1.768938 62.538 2.280937 62.143335 2.686272 61.61 2.984938 61.098005 3.304939 60.43667 3.464939 59.626 3.464939 58.815336 3.464939 58.132669 3.304939 57.578 2.984938 57.044668 2.664938 56.63933 2.248938 56.362 1.736938 56.106 1.246271 55.95667 .723604 55.914 .168938ZM68.65625-10.039062ZM78.54425-17.847062C77.22158-17.847062 76.005588-17.633728 74.89625-17.207062 73.78692-16.801732 72.84825-16.151062 72.08025-15.255062 71.312259-14.359062 70.78959-13.207062 70.51225-11.799061H75.08825C75.23758-12.225731 75.47225-12.577732 75.79225-12.855064 76.13358-13.153728 76.53892-13.377728 77.00825-13.527061 77.49892-13.676395 78.01092-13.751064 78.54425-13.751064 79.54691-13.751064 80.325588-13.537731 80.88025-13.111061 81.43491-12.684395 81.81892-12.119061 82.03225-11.415062 82.24558-10.732395 82.35225-9.975063 82.35225-9.143063V-7.959061C81.968257-8.577728 81.48825-9.047062 80.91225-9.367062 80.33625-9.687061 79.72825-9.91106 79.08825-10.039062 78.46958-10.188396 77.872249-10.263062 77.29625-10.263062 75.52558-10.263062 74.08559-9.868397 72.97625-9.079063 71.86691-8.28973 71.05625-7.255062 70.54425-5.975063 70.03225-4.673729 69.77625-3.276396 69.77625-1.783062 69.77625-.140394 70.064258 1.352938 70.64025 2.696938 71.21625 4.040937 72.08025 5.107605 73.232257 5.896938 74.384258 6.686272 75.82425 7.080938 77.55225 7.080938 78.59759 7.080938 79.52559 6.910273 80.33625 6.568939 81.14692 6.248938 81.840259 5.768938 82.41625 5.128939L82.80025 6.824938H86.896259V-7.895061C86.896259-9.943062 86.629589-11.703064 86.09625-13.175064 85.56292-14.668396 84.67758-15.820396 83.44025-16.631062 82.22425-17.441727 80.59225-17.847062 78.54425-17.847062ZM78.28825-6.231062C79.22692-6.231062 79.99492-6.017729 80.592258-5.591063 81.210918-5.164394 81.66958-4.599062 81.96825-3.895061 82.266918-3.169729 82.41625-2.391062 82.41625-1.559063 82.41625-.684397 82.266918 .094271 81.96825 .776939 81.66958 1.48094 81.22158 2.035604 80.62425 2.440937 80.02692 2.867605 79.25892 3.080938 78.32025 3.080938 77.29625 3.080938 76.48558 2.835606 75.88825 2.344938 75.29092 1.875605 74.86425 1.278271 74.60825 .552938 74.37358-.151062 74.25625-.89773 74.25625-1.687061 74.25625-2.497728 74.38425-3.255062 74.64025-3.959063 74.896259-4.641729 75.32292-5.196396 75.92025-5.623062 76.517589-6.028395 77.30692-6.231062 78.28825-6.231062ZM88.65625-10.039062ZM98.12825-10.263062C96.35758-10.263062 94.853588-9.91106 93.61625-9.207062 92.37892-8.503063 91.42959-7.511063 90.76825-6.231062 90.10692-4.929729 89.77625-3.415062 89.77625-1.687061 89.77625 .062273 90.117588 1.587606 90.80025 2.888939 91.48292 4.211605 92.44292 5.246271 93.68025 5.992939 94.93892 6.739605 96.421588 7.112938 98.12825 7.112938 99.40825 7.112938 100.52825 6.899605 101.48825 6.472939 102.46958 6.046272 103.29092 5.448938 103.95225 4.680939 104.63492 3.912939 105.13625 3.016939 105.45625 1.992939 105.797588 .990271 105.95758-.097729 105.93625-1.271061 105.93625-1.569729 105.92558-1.857729 105.90425-2.135063 105.88292-2.412395 105.840259-2.689728 105.77625-2.967062H94.22425C94.28825-3.607063 94.46958-4.193729 94.76825-4.727062 95.06692-5.260395 95.48292-5.687061 96.01625-6.007063 96.570919-6.305729 97.253589-6.455063 98.06425-6.455063 98.59758-6.455063 99.08825-6.40173 99.53625-6.295063 99.98425-6.167063 100.36825-5.975061 100.68825-5.719063 101.00825-5.463062 101.232257-5.164396 101.36025-4.823063H105.77625C105.49892-6.08173 104.97625-7.116398 104.20825-7.927063 103.461589-8.737728 102.55492-9.335064 101.48825-9.719063 100.421588-10.08173 99.30158-10.263062 98.12825-10.263062ZM94.32025 .168938H101.648258C101.626918 .744938 101.477588 1.278271 101.20025 1.768938 100.94425 2.280937 100.54958 2.686272 100.01625 2.984938 99.50425 3.304939 98.84292 3.464939 98.03225 3.464939 97.22159 3.464939 96.53892 3.304939 95.98425 2.984938 95.45092 2.664938 95.045589 2.248938 94.76825 1.736938 94.512248 1.246271 94.362918 .723604 94.32025 .168938Z" fill="currentColor"/></svg></a>
+  </header><section class="hero"><p class="eyebrow">Механика · импульс и энергия</p><h1>Шайба и подвижная горка</h1><p class="lede">Выбери искомую величину и меняй параметры. Шайба скользит по горке без отрыва. «Быстрый старт» ускоряет показ медленного начала; физическое время видно на часах.</p></section><main class="grid"><div class="col"><section class="card stage-card" aria-label="Сцена"><div class="stage" id="stage"><canvas id="scene" aria-label="Шайба и подвижная горка: интерактивная физическая модель"></canvas><div class="labels" id="labels" aria-hidden="true"><div class="lab" id="l0" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l1" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l2" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l3" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l4" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l5" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l6" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l7" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l8" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l9" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l10" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l11" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l12" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l13" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l14" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l15" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l16" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l17" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l18" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l19" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l20" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l21" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l22" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l23" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l24" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l25" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l26" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l27" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l28" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l29" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l30" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l31" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l32" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l33" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l34" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l35" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l36" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l37" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l38" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l39" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l40" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l41" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l42" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l43" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l44" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l45" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l46" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l47" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l48" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l49" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l50" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l51" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l52" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l53" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l54" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l55" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l56" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l57" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l58" hidden><span class="tex"></span><span class="val"></span></div><div class="lab" id="l59" hidden><span class="tex"></span><span class="val"></span></div></div><div class="pill" id="pill" data-s="idle" role="status"><i></i><span id="pillTxt"></span></div><div class="clock" aria-label="Время"><span id="clock">0,00</span><small>с</small></div></div><div class="tl"><div class="tlm" id="tlm" aria-hidden="true"></div><input type="range" id="time" min="0" max="1000" step="1" value="0" aria-label="Время"></div>
+        <div class="bar">
+          <button class="btn primary" id="play" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path id="icoPlay" d="M8.2 5.3v13.4a.8.8 0 0 0 1.2.7l11-6.7a.8.8 0 0 0 0-1.4l-11-6.7a.8.8 0 0 0-1.2.7z" fill="currentColor"/><path id="icoPause" hidden d="M7 5h3.2v14H7zM13.8 5H17v14h-3.2z" fill="currentColor"/><path id="icoAgain" hidden d="M12 5a7 7 0 1 1-6.6 4.7M12 5 8.6 2.4M12 5 9.2 8.2" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span id="playTxt">Пуск</span>
+          </button>
+          <button class="btn" id="reset" type="button" aria-label="Сброс" disabled>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12a7 7 0 1 0 2.2-5.1M5 4.6v3.9h3.9" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span>Сброс</span>
+          </button>
+          <span class="sp"></span>
+          <div class="seg" role="radiogroup" aria-label="Скорость показа" id="speed">
+            <button type="button" role="radio" aria-checked="false" data-v="0.25">0,25×</button>
+            <button type="button" role="radio" aria-checked="true" data-v="0.5">0,5×</button>
+            <button type="button" role="radio" aria-checked="false" data-v="1">1×</button>
+          </div>
+          <!-- [ПОД ЗАДАЧУ] какие векторы показывать: две-три кнопки по смыслу задачи -->
+          <div class="seg" role="radiogroup" aria-label="Какие векторы показывать" id="vec">
+            <button type="button" role="radio" aria-checked="true" data-v="vel">Скорости</button>
+            <button type="button" role="radio" aria-checked="false" data-v="mom">Импульсы</button>
+          </div>
+        </div>
+</section><section class="card fcard"><h2>Формулы</h2><div class="fg calc-result" id="solveGroup"><div class="fh"><i style="background:var(--green)"></i><span>Расчёт искомой величины</span></div><div class="fl res tex" id="fSolve"></div><p class="fnote" id="solveNote"></p></div><div class="fg" id="group0"><div class="fh"><i style="background:var(--green)"></i><span id="heading0"></span></div><div class="fl res tex" id="f0_0"></div><div class="fl res tex" id="f0_1"></div><div class="fl res tex" id="f0_2"></div></div><div class="fg" id="group1"><div class="fh"><i style="background:var(--violet)"></i><span id="heading1"></span></div><div class="fl res tex" id="f1_0"></div><div class="fl res tex" id="f1_1"></div><div class="fl res tex" id="f1_2"></div></div><div class="fg" id="group2"><div class="fh"><i style="background:var(--orange)"></i><span id="heading2"></span></div><div class="fl res tex" id="f2_0"></div><div class="fl res tex" id="f2_1"></div><div class="fl res tex" id="f2_2"></div></div><div class="fg" id="group3"><div class="fh"><i style="background:var(--ink)"></i><span id="heading3"></span></div><div class="fl res tex" id="f3_0"></div><div class="fl res tex" id="f3_1"></div><div class="fl res tex" id="f3_2"></div></div><p class="fnote" id="fnote"></p></section></div><aside class="col"><section class="card"><h2>Параметры</h2><div class="calc-controls"><label for="target">Рассчитать</label><select id="target"><option value="ratio">Отношение масс m/M</option><option value="m">Масса шайбы m</option><option value="M">Масса горки M</option><option value="v">Скорость v</option><option value="H">Высота H</option><option value="h">Высота h</option><option value="g">Ускорение g</option></select><div class="acts"><button class="btn sm tog" id="toggle_fast" aria-pressed="true">Быстрый старт</button></div><p id="calcNote" class="fnote"></p><p id="calcError" role="alert"></p></div><div class="prm" style="--tint:var(--ink-2)"><label for="ph">Низкая вершина <span class="tex" data-tex="h"></span></label><output id="oh" for="ph"></output><input type="range" id="ph" min="1" max="20" step="0.5" value="10" data-dec="4" data-hard-min="1" data-hard-max="20"></div><div class="prm" style="--tint:var(--ink-2)"><label for="pH">Высокая вершина <span class="tex" data-tex="H"></span></label><output id="oH" for="pH"></output><input type="range" id="pH" min="2" max="50" step="0.5" value="25" data-dec="4" data-hard-min="2" data-hard-max="50"></div><div class="prm" style="--tint:var(--green)"><label for="pv">Скорость на вершине <span class="tex" data-tex="v"></span></label><output id="ov" for="pv"></output><input type="range" id="pv" min="1" max="20" step="0.5" value="10" data-dec="4" data-hard-min="1" data-hard-max="20"></div><div class="prm" style="--tint:var(--green)"><label for="pv0">Малый толчок <span class="tex" data-tex="v_0"></span></label><output id="ov0" for="pv0"></output><input type="range" id="pv0" min="0.01" max="1" step="0.01" value="0.01" data-dec="4" data-hard-min="0.01" data-hard-max="1"></div><div class="prm" style="--tint:var(--violet)"><label for="pM">Масса горки <span class="tex" data-tex="M"></span></label><output id="oM" for="pM"></output><input type="range" id="pM" min="0.2" max="5" step="0.1" value="1" data-dec="4" data-hard-min="0.2" data-hard-max="5"></div><div class="prm" style="--tint:var(--green)"><label for="pm">Масса шайбы <span class="tex" data-tex="m"></span></label><output id="om" for="pm"></output><input type="range" id="pm" min="0.1" max="10" step="0.1" value="2.000003" data-dec="4" data-hard-min="0.1" data-hard-max="10"></div><div class="prm" style="--tint:var(--ink-2)"><label for="pg">Ускорение падения <span class="tex" data-tex="g"></span></label><output id="og" for="pg"></output><input type="range" id="pg" min="1" max="20" step="0.1" value="10" data-dec="4" data-hard-min="1" data-hard-max="20"></div><div class="prm" style="--tint:var(--ink-2)"><label for="pratio">Отношение масс <span class="tex" data-tex="m/M"></span></label><output id="oratio" for="pratio"></output><input type="range" id="pratio" min="0.01" max="20" step="0.01" value="2.000003" data-dec="4" data-hard-min="0.01" data-hard-max="20"></div><div class="bal" id="balTxt"></div></section></aside></main></div><script>
+/* ═══ [ОБЩЕЕ] числовые поля у слайдеров: значение можно ввести с клавиатуры. Не менять. ═══ */
+(() => {
+'use strict';
+/* числовое поле у каждого слайдера. Симуляция по-прежнему слушает событие input слайдера и сама пишет значение в <output>;
+   поле читает число из <output>, а введённое передаёт через слайдер — точно, без округления до его шага */
+const NUM = /^\s*([−-]?\d+(?:[.,]\d+)?)\s*(.*)$/;
+document.querySelectorAll('.prm').forEach(row => {
+  const range = row.querySelector('input[type=range]'), out = row.querySelector('output'), label = row.querySelector('label');
+  if (!range || !out) return;
+  const box = document.createElement('label'), inp = document.createElement('input'), unit = document.createElement('span');
+  box.className = 'nf'; unit.className = 'u';
+  inp.type = 'text'; inp.inputMode = 'decimal'; inp.autocomplete = 'off'; inp.spellcheck = false;
+  inp.setAttribute('aria-label', label ? label.textContent.trim() : '');
+  box.append(inp, unit); out.after(box); out.hidden = true;
+  const stepAttr = range.getAttribute('step'), ds = range.dataset;
+  const dec = ds.dec !== undefined ? +ds.dec : ((stepAttr || '1').split('.')[1] || '').length;      // data-dec: знаков после запятой в числе
+  let shown = '';                                                    // что поле показывало последним: если человек не печатает, значение можно обновить
+  const width = () => { inp.style.width = Math.min(8, Math.max(2, inp.value.length)) + 'ch'; };
+  function sync(force) {
+    const txt = (out.textContent || '').trim(), m = NUM.exec(txt), free = force || document.activeElement !== inp || inp.disabled || inp.value === shown;
+    if (!m) { if (free && txt) { inp.value = txt; width(); } return; }                // «—»: значения сейчас нет
+    unit.textContent = m[2]; unit.hidden = !m[2];
+    if (free) { inp.value = shown = m[1]; width(); }
+  }
+  function commit(v) {
+    if (v === undefined) { const raw = inp.value.replace(/\s/g, '').replace(',', '.').replace('−', '-'); v = raw === '' ? NaN : Number(raw); }
+    if (!isFinite(v)) { sync(true); return; }
+    const lo = ds.hardMin !== undefined ? +ds.hardMin : +range.min, hi = ds.hardMax !== undefined ? +ds.hardMax : +range.max;   // числом можно выйти за шкалу слайдера
+    v = +Math.min(hi, Math.max(lo, v)).toFixed(dec);
+    if (v > +range.max) range.max = v; if (v < +range.min) range.min = v;
+    range.step = 'any'; range.value = String(v);
+    range.dispatchEvent(new Event('input', {bubbles: true}));
+    if (stepAttr === null) range.removeAttribute('step'); else range.step = stepAttr;
+    sync(true);
+  }
+  inp.addEventListener('input', width);
+  inp.addEventListener('change', () => commit());
+  inp.addEventListener('focus', () => inp.select());
+  inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { commit(); inp.select(); }
+    else if (e.key === 'Escape') { sync(true); inp.blur(); }
+    else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      const cur = Number(inp.value.replace(',', '.').replace('−', '-')), st = +stepAttr || 1;
+      if (isFinite(cur)) { e.preventDefault(); commit(cur + (e.key === 'ArrowUp' ? st : -st)); inp.select(); }
+    }
+  });
+  new MutationObserver(() => sync(false)).observe(out, {childList: true, characterData: true, subtree: true});
+  const dis = () => { inp.disabled = range.disabled; };
+  new MutationObserver(dis).observe(range, {attributes: true, attributeFilter: ['disabled']}); dis();
+  sync(true);
+});
+})();
+</script><script>
+window.MathJax = {
+  tex: {},
+  svg: {fontCache: 'none', mtextInheritFont: true},
+  startup: {typeset: false, ready() { MathJax.startup.defaultReady(); MathJax.startup.promise.then(() => window.__mj && window.__mj()); }}
+};
+</script>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-svg.min.js"></script>
+<script>(()=>{'use strict';
+const $=id=>document.getElementById(id),clamp=(x,a,b)=>Math.min(b,Math.max(a,x)),TAU=2*Math.PI,reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+// Pure physics in SI. Time tables invert energy quadratures, never frame stepping.
+const MODELS = (()=>{
+const T=String.raw, gRow=['g','Ускорение падения','g',10,1,20,.1,'м/с²','ink-2'];
+const row=(k,name,sym,...a)=>[k,name,({mu:T`\mu`,alpha:T`\alpha`,dT:T`\Delta T`,phi:T`\varphi`,ps:T`p_{\mathrm{нас}}`,rate:T`\dot m`})[k]||sym,...a], sq=x=>x*x;
+const fmtN=x=>{if(!Number.isFinite(x))return '—';return String(+x.toFixed(Math.abs(x)<.1?4:3)).replace('.', '{,}');};
+const eq=(s,x,u='')=>s+'='+fmtN(x)+(u?T`\ \text{${u}}`:'');
+function table(fn,N=3000){const a=[0];for(let i=0;i<N;i++)a.push(a[i]+fn((i+.5)/N)/N);return {a,N,end:a[N]};}
+function invert(tab,t){let l=0,h=tab.N;while(h-l>1){let m=(l+h)>>1;if(tab.a[m]<t)l=m;else h=m;}return (l+Math.max(0,Math.min(1,(t-tab.a[l])/(tab.a[h]-tab.a[l]||1))))/tab.N;}
+function bez(points,q){let [a,b,c,d]=points,z=1-q;return {x:z*z*z*a[0]+3*z*z*q*b[0]+3*z*q*q*c[0]+q*q*q*d[0],y:z*z*z*a[1]+3*z*z*q*b[1]+3*z*q*q*c[1]+q*q*q*d[1],dx:3*z*z*(b[0]-a[0])+6*z*q*(c[0]-b[0])+3*q*q*(d[0]-c[0]),dy:3*z*z*(b[1]-a[1])+6*z*q*(c[1]-b[1])+3*q*q*(d[1]-c[1])};}
+function trackPlan(p,curve,v0=0){
+ const c=p.M/(p.M+p.m),start=curve(0),mass=p.M+p.m;
+ const speed=q=>{const b=curve(q);return Math.sqrt(Math.max(0,(2*p.g*(start.y-b.y)+(1+p.m/p.M)*v0*v0)/(c*b.dx*b.dx+b.dy*b.dy)));};
+ const tab=table(z=>{const q=z*z;return 2*z/Math.max(speed(q),1e-15);},6000);
+ const atQ=q=>{const b=curve(q),qd=speed(q),shift=-p.m/mass*(b.x-start.x),u=-p.m/mass*b.dx*qd;return {q,x:shift+b.x,y:b.y,shift,u,vx:c*b.dx*qd,vy:b.dy*qd,rx:b.x};};
+ return {tab,atQ,at:t=>atQ(sq(invert(tab,Math.max(0,Math.min(t,tab.end))))),curve};
+}
+const pack=(p,o)=>Object.assign({valid:true,error:'',events:[],summary:'',p},o);
+const bad=(p,msg)=>pack(p,{valid:false,error:msg,tEnd:1,state:()=>({}),bounds:[-1,3,0,3],groups:[],summary:msg});
+const models={};
+models['27107']={title:'Подвижный блок',topic:'Механика · кинематические связи',lede:'Тяни силу и ручки масс. Передвинь маленький брусок и сравни пути обоих тел: свободный конец нити проходит вдвое больше.',modes:['Силы','Скорости'],rows:[row('M','Масса с блоком','M',2,.2,8,.1,'кг','green'),row('m','Масса бруска','m',.75,.1,4,.05,'кг','violet'),row('F','Внешняя сила','F',10,0,40,.5,'Н','orange'),row('D','Зазор между телами','d',1.5,.3,3,.05,'м','ink-2'),gRow],solve(p){
+ const a=p.F/(p.M+4*p.m),Tn=2*p.m*a,tEnd=a>1e-12?Math.sqrt(2*p.D/a):4;
+ return pack(p,{a,Tn,tEnd,bounds:[-p.D-1,p.D+2.3,-.7,1.9],events:[{t:0,label:'старт',key:true},{t:tEnd,label:a?'касание':'покой'}],state:t=>({s:a*t*t/2,sm:a*t*t,v:a*t,vm:2*a*t}),summary:a?'До касания маленький брусок пройдёт '+fmtN(2*p.D).replace('{,}',',')+' м.':'Сила равна нулю: система остаётся в покое.',groups:[['Связь расстояний',T`s_m=2s_M`,T`v_m=2v_M,\quad a_m=2a_M`],['Ускорение',eq(T`a_M=\dfrac{F}{M+4m}`,a,'м/с²'),eq(T`a_m=2a_M`,2*a,'м/с²')],['Силы вдоль движения',T`F-2T=Ma_M`,eq(T`T=ma_m`,Tn,'Н')],['Путь от старта',T`s_M=\dfrac{a_Mt^2}{2}`,T`s_m=a_Mt^2`]]});
+}};
+models['34611']={title:'Три связанных груза',topic:'Механика · трение и связь расстояний',lede:'Меняй массы и трение, тяни подвешенный груз. Сравни пути доски и подвеса и проверь, когда верхний груз начинает скользить.',modes:['Силы','Скорости'],toggles:[['equal','m₁ = m₂',true]],rows:[row('M','Масса доски','M',1.2,.2,5,.1,'кг','green'),row('m1','Верхний груз','m_1',.4,.05,2,.05,'кг','violet'),row('m2','Подвешенный груз','m_2',.4,.05,2,.05,'кг','ink-2'),row('mu','Трение на доске','\mu',.2,0,.8,.01,'','orange'),row('D','Ход подвеса','d',1.2,.2,3,.05,'м','ink-2'),row('L','До края доски','L',.5,.1,1,.02,'м','ink-2'),gRow],solve(p){
+ const common=p.m2*p.g/(p.M+p.m1+p.m2),stick=common<=p.mu*p.g+1e-10,a=stick?common:(p.m2*p.g-p.mu*p.m1*p.g)/(p.M+p.m2),a1=stick?a:p.mu*p.g,f=p.m1*a1,Tn=p.m2*(p.g-a),drop=Math.sqrt(2*p.D/a),edge=stick?Infinity:Math.sqrt(2*p.L/(a-a1)),tEnd=Math.min(drop,edge),maxm=p.mu<.5?p.mu*p.M/(1-2*p.mu):Infinity;
+ return pack(p,{a,a1,stick,f,Tn,tEnd,bounds:[-.8,p.D+3,-p.D-.8,2],events:[{t:0,label:stick?'вместе':'скольжение',key:true},{t:tEnd,label:edge<drop?'край':'низ'}],state:t=>({s:a*t*t/2,s1:a1*t*t/2,v:a*t,v1:a1*t}),summary:stick?'Верхний груз движется вместе с доской.':'Верхний груз скользит; показ заканчивается у края или внизу.',groups:[['Кинематическая связь',T`s_M=s_2,\quad v_M=v_2`,stick?T`s_1=s_M`:T`s_{\mathrm{отн}}=s_M-s_1`],['Ускорения',eq(stick?T`a=\dfrac{m_2g}{M+m_1+m_2}`:T`a_M=\dfrac{m_2g-\mu m_1g}{M+m_2}`,a,'м/с²'),eq(stick?T`a_1=a`:T`a_1=\mu g`,a1,'м/с²')],['Трение и натяжение',eq(T`F_{\mathrm{тр}}=m_1a_1`,f,'Н'),eq(T`T=m_2(g-a_M)`,Tn,'Н')],['Без скольжения',T`\dfrac{m_2}{M+m_1+m_2}\le\mu`,p.mu<.5?eq(T`m_1=m_2:\quad m\le\dfrac{\mu M}{1-2\mu}`,maxm,'кг'):T`m_1=m_2,\ \mu\ge0{,}5:\quad m>0`]]});
+}};
+models['18313']={title:'Шайба на склоне',topic:'Механика · трение в двух направлениях',lede:'Тяни стрелку силы и меняй наклон. Сила действует вдоль нижнего ребра; шайба начинает двигаться по направлению суммы сил в плоскости.',modes:['Силы','Скорости'],toggles:[['threshold','Порог сдвига',true]],rows:[row('m','Масса шайбы','m',1,.2,5,.1,'кг','green'),row('alpha','Наклон плоскости','\alpha',30,0,60,1,'°','ink-2'),row('mu','Коэффициент трения','\mu',.8,0,1.5,.01,'','orange'),row('F','Поперечная сила','F',4.7958315,0,25,.1,'Н','orange'),row('D','Путь по плоскости','s',2,.2,5,.1,'м','ink-2'),gRow],solve(p){
+ const angle=p.alpha*Math.PI/180,N=p.m*p.g*Math.cos(angle),down=p.m*p.g*Math.sin(angle),limit=p.mu*N,critical=Math.sqrt(Math.max(0,limit*limit-down*down)),drive=Math.hypot(p.F,down),moving=drive>limit+1e-8,a=moving?(drive-limit)/p.m:0,ux=drive?p.F/drive:0,uy=drive?down/drive:0,fr=moving?limit:drive;
+ const tEnd=a>0?Math.sqrt(2*p.D/a):4;
+ return pack(p,{N,down,limit,critical,drive,moving,a,ux,uy,fr,tEnd,bounds:[-1,4,-1,4],events:[{t:0,label:moving?'сдвиг':'равновесие',key:true},{t:tEnd,label:moving?'путь пройден':'покой'}],state:t=>({s:a*t*t/2,v:a*t,x:ux*a*t*t/2,y:uy*a*t*t/2}),summary:down>limit+1e-8?'Шайба скользит даже при F = 0.':moving?'Трение направлено против движения по наклонной.':'Шайба в покое. Для сдвига превысь порог силы.',groups:[['Силы в плоскости',eq(T`N=mg\cos\alpha`,N,'Н'),eq(T`G_{\parallel}=mg\sin\alpha`,down,'Н'),eq(T`R=\sqrt{F^2+(mg\sin\alpha)^2}`,drive,'Н')],['Порог сдвига',down<=limit?eq(T`F_{\mathrm{кр}}=mg\sqrt{\mu^2\cos^2\alpha-\sin^2\alpha}`,critical,'Н'):T`mg\sin\alpha>\mu N:\quad F_{\mathrm{кр}}=0`,T`R>\mu N:\quad\text{скольжение}`],['Движение',eq(moving?T`a=\dfrac{R-\mu N}{m}`:T`a`,a,'м/с²'),T`s=\dfrac{at^2}{2}`],['Направление',T`\vec F_{\mathrm{тр}}\uparrow\downarrow\vec v`,eq(T`F_{\mathrm{тр}}`,fr,'Н')]]});
+}};
+models['149702']={title:'Шарик в подвижной трубке',topic:'Механика · импульс и энергия',lede:'Меняй высоты и массы. Переключи задание скоростей, чтобы найти высоту старта. Тяни шарик и ручки трубки; скорости заданы относительно стола.',modes:['Скорости','Импульсы'],toggles:[['inverse','Задать V и u',true]],rows:[row('h','Высота выхода','h',1,.2,3,.05,'м','ink-2'),row('H','Высота старта','H',1.525,.3,6,.05,'м','ink-2'),row('V','Скорость вылета','V',3,.2,8,.1,'м/с','green'),row('u','Скорость доски','u',.5,.05,3,.05,'м/с','violet'),row('m','Масса шарика','m',1,.1,3,.1,'кг','green'),row('M','Доска с трубкой','M',6,.2,15,.2,'кг','violet'),gRow],solve(p){
+ if(p.H<=p.h)return bad(p,'Высота старта H должна быть больше высоты выхода h.');
+ const d=p.H-p.h,scale=Math.max(p.H,p.h),x=scale*.7,curves=[[[3*x,p.H],[2.6*x,p.H-d*.35],[.9*x,.12*p.h],[1.8*x,.12*p.h]],[[1.8*x,.12*p.h],[3*x,.12*p.h],[3*x,p.h],[1.5*x,p.h]],[[1.5*x,p.h],[x,p.h],[.4*x,p.h],[0,p.h]]];
+ const curve=q=>{let n=Math.min(2,Math.floor(q*3)),b=bez(curves[n],q*3-n);b.dx*=3;b.dy*=3;return b;};
+ const path=trackPlan(p,curve),exit=path.atQ(1),tc=path.tab.end,tf=Math.sqrt(2*p.h/p.g),tEnd=tc+tf,V=Math.abs(exit.vx),u=exit.u;
+ const state=t=>{if(t<=tc)return {...path.at(t),ph:'tube'};const dt=Math.min(tf,t-tc);return {...exit,x:exit.x+exit.vx*dt,y:Math.max(0,p.h-p.g*dt*dt/2),shift:exit.shift+u*dt,vy:-p.g*dt,ph:'fly'};};
+ const end=state(tEnd),xmin=Math.min(0,end.x)-.5*scale,xmax=Math.max(3.4*x+end.shift,3.4*x)+.3*scale;
+ return pack(p,{path,curve,tc,tf,V,u,tEnd,xscale:x,state,bounds:[xmin,xmax,-.3*scale,p.H+.4*scale],events:[{t:tc,label:'вылет',key:true},{t:tEnd,label:'земля'}],summary:'Горизонтальный импульс системы сохраняется; трубка откатывается вправо.',groups:[['Горизонтальный импульс',T`mV=Mu`,eq(T`\dfrac mM=\dfrac uV`,p.m/p.M)],['Энергия',T`mg(H-h)=\dfrac{mV^2+Mu^2}{2}`,eq(T`H=h+\dfrac{V(V+u)}{2g}`,p.H,'м')],['Скорости вылета',eq(T`V=\sqrt{\dfrac{2g(H-h)}{1+m/M}}`,V,'м/с'),eq(T`u=\dfrac mM V`,u,'м/с')],['После вылета',eq(T`t_{\mathrm{пол}}=\sqrt{\dfrac{2h}{g}}`,tf,'с'),eq(T`s_x=Vt_{\mathrm{пол}}`,V*tf,'м')]]});
+}};
+models['18878']={title:'Шайба и подвижная горка',topic:'Механика · импульс и энергия',lede:'Тяни вершины и ручки масс. Сравни движение шайбы и откат горки. Малый начальный толчок можно менять; он учитывается в энергии.',modes:['Скорости','Импульсы'],toggles:[['inverse','Задать скорость на вершине',true]],rows:[row('h','Низкая вершина','h',10,1,20,.5,'м','ink-2'),row('H','Высокая вершина','H',25,2,50,.5,'м','ink-2'),row('v','Скорость на вершине','v',10,1,20,.5,'м/с','green'),row('v0','Малый толчок','v_0',.01,.01,1,.01,'м/с','green'),row('M','Масса горки','M',1,.2,5,.1,'кг','violet'),row('m','Масса шайбы','m',2.000003,.1,10,.1,'кг','green'),gRow],solve(p){
+ if(p.H<=p.h||p.m<=0||!Number.isFinite(p.m))return bad(p,'Нужны H > h и положительное отношение масс. Уменьши заданную скорость.');
+ const span=7*p.H*Math.sqrt((1+p.m/p.M)/3),valley=.32*p.h;
+ const curve=q=>{let y,dy;if(q<=.55){const z=q/.55;y=valley+(p.H-valley)*(1+Math.cos(Math.PI*z))/2;dy=-(p.H-valley)*Math.PI*Math.sin(Math.PI*z)/(2*.55);}else{const z=(q-.55)/.45;y=valley+(p.h-valley)*(1-Math.cos(Math.PI*z))/2;dy=(p.h-valley)*Math.PI*Math.sin(Math.PI*z)/(2*.45);}return{x:-span*q,y,dx:-span,dy};};
+ const path=trackPlan(p,curve,p.v0),end=path.atQ(1),v=-end.vx,u=end.u,tEnd=path.tab.end;
+ return pack(p,{path,curve,span,v,u,tEnd,state:t=>path.at(t),bounds:[-span*1.05,span*p.m/(p.M+p.m)+.05*span,-.12*p.H,1.18*p.H],events:[{t:path.tab.a[Math.round(Math.sqrt(.55)*path.tab.N)],label:'впадина',key:true},{t:tEnd,label:'вершина'}],summary:'Горка движется вправо; показ заканчивается на низкой вершине.',groups:[['Горизонтальный импульс',T`mv=Mu`,eq(T`u=\dfrac mM v`,u,'м/с')],['Скорость на вершине',eq(T`v=\sqrt{v_0^2+\dfrac{2g(H-h)}{1+m/M}}`,v,'м/с'),T`v_0\to0:\quad mg(H-h)=\dfrac{mv^2+Mu^2}{2}`],['Отношение масс',eq(T`\dfrac mM=\dfrac{2g(H-h)}{v^2-v_0^2}-1`,p.m/p.M),T`v_0\to0:\quad\dfrac mM=\dfrac{2g(H-h)}{v^2}-1`],['Перемещения',T`M\Delta x_M+m\Delta x_m=0`,T`\Delta x_m=\Delta x_M+\Delta x_{\mathrm{отн}}`]]});
+}};
+models['112703']={title:'Пуля, поршень и газ',topic:'Термодинамика · удар и сжатие',lede:'Тяни поршень, пулю и ручки масс. Задай нагрев или скорость пули. Часы показывают миллисекунды: базовый показ замедлен в 1000 раз.',modes:['Скорости','Импульсы'],toggles:[['inverse','Задать нагрев',true]],timeUnit:'мс',rows:[row('p0','Начальное давление','p_0',100,20,300,5,'кПа','ink-2'),row('V0','Объём газа','V_0',2,.5,5,.1,'л','ink-2'),row('T0','Температура газа','T_0',20,-50,150,1,'°C','orange'),row('dT','Нагрев газа','\Delta T',60,5,150,1,'К','orange'),row('M','Масса поршня','M',200,50,600,10,'г','violet'),row('m','Масса пули','m',10,2,40,1,'г','green'),row('v','Скорость пули','v',507.85,50,1000,10,'м/с','green'),row('S','Площадь поршня','S',100,20,200,5,'см²','ink-2'),row('d','Путь до поршня','d',.3,.1,1,.05,'м','ink-2'),gRow],solve(p){
+ const m=p.m/1000,M=p.M/1000,mass=M+m,p0=p.p0*1000,V0=p.V0/1000,S=p.S/1e4,T0=p.T0+273.15,gamma=5/3,u=m*p.v/mass,K=mass*u*u/2,Cv=p0*V0/(gamma-1),dT=K*T0/Cv,zmin=Math.pow(1+K/Cv,-1/(gamma-1)),length=V0/S,tc=p.d/p.v;
+ const vel=z=>Math.sqrt(Math.max(0,u*u-2*Cv*(Math.pow(z,1-gamma)-1)/mass));
+ const tab=table(w=>{const theta=w*Math.PI/2,z=1-(1-zmin)*sq(Math.sin(theta));return length*(1-zmin)*Math.sin(2*theta)*Math.PI/2/Math.max(vel(z),1e-12);},5000);
+ const tEnd=(tc+tab.end)*1000,state=t=>{const seconds=t/1000;if(seconds<tc)return {ph:'bullet',z:1,x:length+p.d-p.v*seconds,u:0,v:p.v,T:T0,p:p0};const w=invert(tab,Math.min(seconds-tc,tab.end)),z=1-(1-zmin)*sq(Math.sin(w*Math.PI/2));return{ph:'gas',z,x:length*z,u:vel(z),v:vel(z),T:T0*Math.pow(z,1-gamma),p:p0*Math.pow(z,-gamma)};};
+ return pack(p,{m,M,u,K,dT,zmin,length,tc:tc*1000,tEnd,state,bounds:[-.15*length,length+p.d+.4*length,-.4*length,1.8*length],events:[{t:tc*1000,label:'удар',key:true},{t:tEnd,label:'стоп'}],summary:'Аргон: одноатомный идеальный газ; теплообмена при сжатии нет.',groups:[['Абсолютно неупругий удар',T`mv=(M+m)u`,eq(T`u=\dfrac{mv}{M+m}`,u,'м/с')],['Адиабатическое сжатие',eq(T`\Delta U=\dfrac32\dfrac{p_0V_0}{T_0}\Delta T`,K,'Дж'),T`\dfrac{(M+m)u^2}{2}=\Delta U`],['Скорость пули',eq(T`v=\dfrac{\sqrt{3(M+m)p_0V_0\Delta T/T_0}}m`,p.v,'м/с'),eq(T`T_0`,T0,'К')],['Крайнее положение',eq(T`\Delta T=\dfrac{m^2v^2T_0}{3(M+m)p_0V_0}`,dT,'К'),eq(T`\dfrac{V_{\min}}{V_0}=\left(\dfrac{T_0}{T_0+\Delta T}\right)^{3/2}`,zmin)]]});
+}};
+models['182269']={title:'Песок и точка росы',topic:'Термодинамика · изотермическое сжатие',lede:'Насыпай песок и меняй начальную влажность. Тяни поршень и массу песка: при постоянной температуре сжатие доводит пар до насыщения.',modes:['Силы','Давления'],rows:[row('phi','Начальная влажность','\varphi',60,5,100,1,'%','green'),row('S','Площадь поршня','S',20,5,60,1,'см²','ink-2'),row('p0','Внешнее давление','p_0',100,50,150,1,'кПа','ink-2'),row('ps','Давление насыщения','p_{\mathrm{нас}}',2.34,.5,5,.01,'кПа','violet'),row('V0','Начальный объём','V_0',1,.2,3,.1,'л','ink-2'),row('sand','Масса песка','m',25,1,60,1,'кг','orange'),row('rate','Темп насыпания','\dot m',5,.5,10,.5,'кг/с','orange'),gRow],solve(p){
+ const phi=p.phi/100,S=p.S/1e4,p0=p.p0*1000,ps=p.ps*1000,V0=p.V0/1000;
+ if(phi*ps>=p0)return bad(p,'Давление водяного пара должно быть меньше начального полного давления.');
+ const critical=p0*S/p.g*(1/phi-1),tEnd=p.sand/p.rate,tc=critical/p.rate;
+ const state=t=>{const mass=Math.min(p.sand,t*p.rate),pressure=p0+mass*p.g/S,dew=mass>=critical-1e-10,z=dew?(p0-phi*ps)/(pressure-ps):p0/pressure,pv=dew?ps:phi*ps/z;return{mass,pressure,z,pv,humidity:pv/ps,condensed:dew?Math.max(0,1-z/phi):0,dew};};
+ return pack(p,{critical,tc,tEnd,state,bounds:[-1,3,-.4,4],events:[...(tc<=tEnd?[{t:tc,label:'роса',key:true}]:[{t:0,label:'сжатие',key:true}]),{t:tEnd,label:'насыпано'}],summary:tc<=tEnd?'После насыщения часть пара конденсируется на стенках.':'Этой массы песка недостаточно для появления росы.',groups:[['Равновесие поршня',T`pS=p_0S+mg`,eq(T`p=p_0+\dfrac{mg}{S}`,p0+p.sand*p.g/S,'Па')],['До появления росы',T`pV=p_0V_0`,T`p_{\mathrm{пар}}V=\varphi p_{\mathrm{нас}}V_0`],['Начало конденсации',T`V_{\mathrm{роса}}=\varphi V_0`,eq(T`m_{\mathrm{роса}}=\dfrac{p_0S}{g}\left(\dfrac1\varphi-1\right)`,critical,'кг')],['После насыщения',T`p_{\mathrm{пар}}=p_{\mathrm{нас}}`,T`(p-p_{\mathrm{нас}})V=(p_0-\varphi p_{\mathrm{нас}})V_0`]]});
+}};
+return models;
+})();
+if(typeof module!=='undefined')module.exports=MODELS;
+
+// Inverse problems share the same physical equations as the animation.
+function configureModels(models){
+ const add=(id,row)=>models[id].rows.push(row);
+ const r=(k,n,s,v,lo,hi,st,u='')=>[k,n,s,v,lo,hi,st,u,'ink-2'];
+ add('27107',r('a','Ускорение большого тела','a_M',2,0,20,.1,'м/с²'));
+ add('27107',r('T','Натяжение нити','T',3,0,40,.1,'Н'));
+ add('18878',r('ratio','Отношение масс','m/M',2.000003,.01,20,.01));
+ add('112703',r('nu','Количество газа','\\nu',.082059,.001,1,.001,'моль'));
+ models['18313'].toggles=[];models['149702'].toggles=[];models['112703'].toggles=[];
+ models['18878'].toggles=[['fast','Быстрый старт',true]];
+ models['34611'].toggles=[['together','Двигаться как единое целое',true],['equal','m₁ = m₂',true]];
+ const choices={
+  '27107':[['a','Ускорение a_M'],['F','Сила F'],['M','Масса M'],['m','Масса m'],['T','Натяжение T']],
+  '18313':[['F','Сила F'],['mu','Коэффициент трения μ'],['m','Масса m'],['alpha','Угол α'],['g','Ускорение g'],['none','Свободное движение']],
+  '149702':[['H','Высота старта H'],['h','Высота выхода h'],['V','Скорость шарика V'],['u','Скорость доски u'],['M','Масса доски M'],['m','Масса шарика m'],['g','Ускорение g']],
+  '18878':[['ratio','Отношение масс m/M'],['m','Масса шайбы m'],['M','Масса горки M'],['v','Скорость v'],['H','Высота H'],['h','Высота h'],['g','Ускорение g']],
+  '34611':[['m1','Масса верхнего груза m₁'],['M','Масса нижнего тела M'],['m2','Масса подвеса m₂'],['mu','Коэффициент трения μ']],
+  '112703':[['v','Скорость пули v'],['dT','Нагрев ΔT'],['nu','Количество газа ν'],['V0','Начальный объём V₀'],['M','Масса поршня M'],['m','Масса пули m'],['p0','Начальное давление p₀'],['T0','Начальная температура T₀']]
+ };
+ for(const id in choices){models[id].choices=choices[id];models[id].target=choices[id][0][0];}
+ models['149702'].lede='Выбери искомую величину, меняй высоты и массы. Шарик проходит по трубке, доска откатывается. Все скорости заданы относительно стола.';
+ models['18313'].lede='Найди порог сдвига по силе, трению, массе или углу. В свободном режиме проверь движение шайбы при выбранных параметрах.';
+ models['34611'].lede='Выбери место крепления нити и искомую величину. Рассчитай границу совместного движения или отключи условие и наблюдай движение при заданных параметрах.';
+ models['112703'].lede='Выбери искомую величину и способ задания количества газа. Модель подходит для гелия и аргона. Время на сцене — в миллисекундах.';
+ models['18878'].lede='Выбери искомую величину и меняй параметры. Шайба скользит по горке без отрыва. «Быстрый старт» ускоряет показ медленного начала; физическое время видно на часах.';
+ for(const id of ['34611','112703'])for(const row of models[id].rows){if(['M','m1','m2'].includes(row[0])&&id==='34611')row[5]=30;}
+ models['34611'].solve=solveThreeBodies;
+ const gasSolve=models['112703'].solve;
+ const temperature=models['112703'].rows.find(r=>r[0]==='T0');temperature[3]=293.15;temperature[4]=100;temperature[5]=1500;temperature[7]='К';
+ models['112703'].solve=p=>{const v=gasSolve({...p,T0:p.T0-273.15});v.summary='Гелий или аргон: одноатомный идеальный газ, γ = 5/3. Теплообмена при сжатии нет.';return v;};
+ const slopeSolve=models['18313'].solve;
+ models['18313'].solve=p=>{const v=slopeSolve(p);v.groups[0][2]=String.raw`mg\sin\alpha=`+String(+v.down.toFixed(4)).replace('.', '{,}')+String.raw`\ \text{Н}`;v.summary+=' mg sin α — составляющая силы тяжести вдоль склона.';return v;};
+}
+function solveThreeBodies(p){
+ const top=!!p.pullTop,total=p.M+p.m1+p.m2,common=p.m2*p.g/total,required=(top?p.M:p.m1)*common,cap=p.mu*p.m1*p.g,stick=required<=cap+1e-9;
+ const a=stick?common:top?p.mu*p.m1*p.g/p.M:(p.m2*p.g-cap)/(p.M+p.m2);
+ const a1=stick?common:top?(p.m2*p.g-cap)/(p.m1+p.m2):p.mu*p.g,a2=top?a1:a;
+ const f=stick?required:cap,Tn=p.m2*(p.g-a2),drop=Math.sqrt(2*p.D/a2),edge=stick?Infinity:Math.sqrt(2*p.L/Math.abs(a-a1)),tEnd=Math.min(drop,edge);
+ const tex=String.raw,n=x=>String(+x.toFixed(4)).replace('.', '{,}'),eq=(s,x,u='')=>s+'='+n(x)+(u?tex`\ \text{${u}}`:'');
+ return {p,valid:true,error:'',top,stick,a,a1,a2,f,Tn,tEnd,bounds:[-.7,p.D+2.1,-p.D-.6,2.1],events:[{t:0,label:stick?'вместе':'скольжение',key:true},{t:tEnd,label:edge<drop?'край':'низ'}],state:t=>({s:a*t*t/2,s1:a1*t*t/2,s2:a2*t*t/2,v:a*t,v1:a1*t,v2:a2*t}),summary:stick?'Верхнее и нижнее тела движутся как единое целое.':'Есть скольжение: движение не навязывается, а определяется силами.',groups:[
+ ['Кинематическая связь',top?tex`s_1=s_2,\quad v_1=v_2`:tex`s_M=s_2,\quad v_M=v_2`,stick?tex`s_1=s_M`:tex`s_{\mathrm{отн}}=|s_1-s_M|`],
+ ['Ускорения',eq(stick?tex`a=\dfrac{m_2g}{M+m_1+m_2}`:top?tex`a_M=\dfrac{\mu m_1g}{M}`:tex`a_M=\dfrac{m_2g-\mu m_1g}{M+m_2}`,a,'м/с²'),eq(stick?tex`a_1=a`:top?tex`a_1=\dfrac{m_2g-\mu m_1g}{m_1+m_2}`:tex`a_1=\mu g`,a1,'м/с²')],
+ ['Горизонтальные силы',top?tex`Ma_M=F_{\mathrm{тр}},\quad m_1a_1=T-F_{\mathrm{тр}}`:tex`Ma_M=T-F_{\mathrm{тр}},\quad m_1a_1=F_{\mathrm{тр}}`,eq(tex`T=m_2(g-a_2)`,Tn,'Н')],
+ ['Без скольжения',top?tex`\dfrac{Mm_2}{m_1(M+m_1+m_2)}\le\mu`:tex`\dfrac{m_2}{M+m_1+m_2}\le\mu`,eq(tex`F_{\mathrm{тр}}`,f,'Н')]]};
+}
+function solveSelection(id,p,target,o={}){
+ const T=String.raw,R=8.314462618;let locks=[],formula='',note='',error='';
+ const fail=s=>{throw Error(s);},positive=(x,s='Для этих данных нет положительного решения.')=>{if(!Number.isFinite(x)||x<=0)fail(s);return x;};
+ const set=(k,v,f,zero=false)=>{if(!Number.isFinite(v)||(zero?v<0:v<=0))fail('Для выбранных данных нет допустимого значения искомой величины.');p[k]=v;locks.push(k);formula=f;};
+ try{
+ if(id==='27107'){
+  if(target==='F')set('F',p.a*(p.M+4*p.m),T`F=a_M(M+4m)`,true);
+  if(target==='M')set('M',p.F/positive(p.a)-4*p.m,T`M=\dfrac F{a_M}-4m`);
+  if(target==='m')set('m',(p.F/positive(p.a)-p.M)/4,T`m=\dfrac{F/a_M-M}{4}`);
+  p.a=p.F/(p.M+4*p.m);p.T=2*p.m*p.a;
+  if(target==='a'||target==='T'){locks.push('a');formula=target==='a'?T`a_M=\dfrac F{M+4m}`:T`T=\dfrac{2mF}{M+4m}`;}locks.push('T');
+  note='a_M — ускорение большого тела; a_m = 2a_M. Натяжение одинаково в обеих ветвях.';
+ }
+ if(id==='18313'&&target!=='none'){
+  const a=p.alpha*Math.PI/180,c=Math.cos(a),s=Math.sin(a),d=p.mu*p.mu*c*c-s*s;
+  if(target==='F'){if(d< -1e-12)fail('При таком наклоне шайба уже скользит без поперечной силы: μ < tg α. Порог покоя по F отсутствует.');set('F',p.m*p.g*Math.sqrt(Math.max(0,d)),T`F_{\mathrm{кр}}=mg\sqrt{\mu^2\cos^2\alpha-\sin^2\alpha}`,true);note='Сдвиг при F > Fкр; на самой границе шайба ещё может покоиться.';}
+  if(target==='mu'){set('mu',Math.hypot(p.F/(p.m*p.g),s)/c,T`\mu_{\mathrm{кр}}=\dfrac{\sqrt{(F/mg)^2+\sin^2\alpha}}{\cos\alpha}`,true);note='Сдвиг при μ < μкр; при μ ≥ μкр возможен покой.';}
+  if(target==='m'||target==='g'){positive(d,'При μ ≤ tg α положительного порога по массе или g нет (либо он не единственный).');set(target,p.F/(positive(target==='m'?p.g:p.m)*Math.sqrt(d)),target==='m'?T`m_{\mathrm{кр}}=\dfrac F{g\sqrt{\mu^2\cos^2\alpha-\sin^2\alpha}}`:T`g_{\mathrm{кр}}=\dfrac F{m\sqrt{\mu^2\cos^2\alpha-\sin^2\alpha}}`);note=target==='m'?'Сдвиг при m < mкр.':'Сдвиг при g < gкр.';}
+  if(target==='alpha'){const z=(p.mu*p.mu-(p.F/(p.m*p.g))**2)/(1+p.mu*p.mu);if(z<0||z>=1)fail('При заданной силе покой невозможен даже на горизонтальной плоскости.');set('alpha',Math.asin(Math.sqrt(z))*180/Math.PI,T`\alpha_{\mathrm{кр}}=\arcsin\sqrt{\dfrac{\mu^2-(F/mg)^2}{1+\mu^2}}`,true);note='Сдвиг при α > αкр.';}
+ }
+ if(id==='18313'&&target==='none')note='Свободный режим: все параметры задаются вручную. mg sin α — составляющая силы тяжести вдоль склона.';
+ if(id==='149702'){
+  const d=p.H-p.h;
+  if(target==='H'||target==='h'||target==='g'){
+   if(target==='H')set('H',p.h+p.V*(p.V+p.u)/(2*p.g),T`H=h+\dfrac{V(V+u)}{2g}`);
+   if(target==='h')set('h',p.H-p.V*(p.V+p.u)/(2*p.g),T`h=H-\dfrac{V(V+u)}{2g}`,true);
+   if(target==='g')set('g',p.V*(p.V+p.u)/(2*positive(d)),T`g=\dfrac{V(V+u)}{2(H-h)}`);
+   p.M=p.m*p.V/positive(p.u);locks.push('M');note='V и u заданы независимо. Для сохранения импульса масса доски также рассчитана: M = mV/u.';
+  }else if(target==='V'||target==='u'){
+   p.V=Math.sqrt(2*p.g*positive(d)/(1+p.m/p.M));p.u=p.m/p.M*p.V;locks.push('V','u');formula=target==='V'?T`V=\sqrt{\dfrac{2g(H-h)}{1+m/M}}`:T`u=\dfrac mM\sqrt{\dfrac{2g(H-h)}{1+m/M}}`;note='Обе скорости рассчитаны по заданным массам и высотам.';
+  }else{
+   p.u=positive(2*p.g*positive(d)/positive(p.V)-p.V,'Скорость V слишком велика для положительной массы доски.');locks.push('u');
+   if(target==='M')set('M',p.m*p.V/p.u,T`M=\dfrac{mV^2}{2g(H-h)-V^2}`);
+   if(target==='m')set('m',p.M*p.u/p.V,T`m=M\left(\dfrac{2g(H-h)}{V^2}-1\right)`);
+   note='V задана; скорость доски u найдена одновременно с массой.';
+  }
+ }
+ if(id==='18878'){
+  const ratio=p.m/p.M,dv=p.v*p.v-p.v0*p.v0;
+  if(['ratio','m','M'].includes(target)){
+   p.ratio=positive(2*p.g*(p.H-p.h)/positive(dv)-1,'Такая скорость несовместима с положительным отношением масс.');locks.push('ratio');
+   if(target==='M')set('M',p.m/p.ratio,T`M=\dfrac m{2g(H-h)/(v^2-v_0^2)-1}`);
+   else{p.m=p.M*p.ratio;locks.push('m');formula=target==='ratio'?T`\dfrac mM=\dfrac{2g(H-h)}{v^2-v_0^2}-1`:T`m=M\left(\dfrac{2g(H-h)}{v^2-v_0^2}-1\right)`;}
+  }else{
+   p.ratio=ratio;locks.push('ratio');
+   if(target==='v')set('v',Math.sqrt(p.v0*p.v0+2*p.g*positive(p.H-p.h)/(1+ratio)),T`v=\sqrt{v_0^2+\dfrac{2g(H-h)}{1+m/M}}`);
+   if(target==='H')set('H',p.h+(1+ratio)*positive(dv)/(2*p.g),T`H=h+\dfrac{(1+m/M)(v^2-v_0^2)}{2g}`);
+   if(target==='h')set('h',p.H-(1+ratio)*positive(dv)/(2*p.g),T`h=H-\dfrac{(1+m/M)(v^2-v_0^2)}{2g}`);
+   if(target==='g')set('g',(1+ratio)*positive(dv)/(2*positive(p.H-p.h)),T`g=\dfrac{(1+m/M)(v^2-v_0^2)}{2(H-h)}`);
+  }
+  note='Малый толчок v₀ учтён в энергии; суммарный горизонтальный импульс равен нулю.';
+ }
+ if(id==='34611'){
+  p.pullTop=!!o.pullTop;
+  if(o.equal){if(target==='m2'&&o.together)p.m1=p.m2;else p.m2=p.m1;locks.push(target==='m2'&&o.together?'m1':'m2');}
+  if(!o.together){note='Без условия: массы и трение задаются вручную, режим движения определяется автоматически.';}
+  else{
+   const top=p.pullTop,mu=p.mu;let boundary='';
+   if(target==='mu'){set('mu',p.m2/(p.M+p.m1+p.m2)*(top?p.M/p.m1:1),top?T`\mu_{\min}=\dfrac{Mm_2}{m_1(M+m_1+m_2)}`:T`\mu_{\min}=\dfrac{m_2}{M+m_1+m_2}`);boundary='μ ≥ μmin';}
+   if(o.equal&&['m1','m2'].includes(target)){
+    let v;if(top){v=p.M*(1-mu)/(2*positive(mu));formula=T`m_{\min}=\dfrac{M(1-\mu)}{2\mu}`;boundary='m₁ = m₂ = m ≥ mmin';}
+    else {v=mu*p.M/positive(1-2*mu,'При μ ≥ 0,5 совместное движение возможно при любых равных положительных массах. Конечного максимума нет.');formula=T`m_{\max}=\dfrac{\mu M}{1-2\mu}`;boundary='m₁ = m₂ = m ≤ mmax';}
+    positive(v);p.m1=p.m2=v;locks.push('m1','m2');
+   }else if(target==='M'){
+    if(top){set('M',mu*p.m1*(p.m1+p.m2)/positive(p.m2-mu*p.m1,'Совместное движение возможно при любой положительной M; конечного максимума нет.'),T`M_{\max}=\dfrac{\mu m_1(m_1+m_2)}{m_2-\mu m_1}`);boundary='M ≤ Mmax';}
+    else{set('M',p.m2/positive(mu)-p.m1-p.m2,T`M_{\min}=\dfrac{m_2}{\mu}-m_1-m_2`,true);boundary='M ≥ Mmin';if(p.M===0)fail('Любая положительная масса M удовлетворяет условию; положительной нижней границы нет.');}
+   }else if(!o.equal&&target==='m1'){
+    if(top)set('m1',(-(p.M+p.m2)+Math.sqrt((p.M+p.m2)**2+4*p.M*p.m2/positive(mu)))/2,T`m_{1,\min}=\dfrac{\sqrt{(M+m_2)^2+4Mm_2/\mu}-M-m_2}{2}`);
+    else set('m1',p.m2/positive(mu)-p.M-p.m2,T`m_{1,\min}=\dfrac{m_2}{\mu}-M-m_2`);
+    boundary='m₁ ≥ m₁,min';
+   }else if(!o.equal&&target==='m2'){
+    if(top)set('m2',mu*p.m1*(p.M+p.m1)/positive(p.M-mu*p.m1,'При этих параметрах конечного максимума m₂ нет.'),T`m_{2,\max}=\dfrac{\mu m_1(M+m_1)}{M-\mu m_1}`);
+    else set('m2',mu*(p.M+p.m1)/positive(1-mu,'При μ ≥ 1 конечного максимума m₂ нет.'),T`m_{2,\max}=\dfrac{\mu(M+m_1)}{1-\mu}`);
+    boundary='m₂ ≤ m₂,max';
+   }
+   note='Совместное движение: '+boundary+'. На рисунке — граничное значение.';
+  }
+ }
+ if(id==='112703'){
+  let m=p.m/1000,M=p.M/1000,temp=p.T0,nu=p.p0*p.V0/(R*temp);
+  const amount=o.basis==='nu'&&!['nu','V0','p0','T0'].includes(target);
+  if(amount){nu=p.nu;p.V0=nu*R*temp/p.p0;locks.push('V0');}
+  const B=3*nu*R*p.dT;
+  if(target==='v')set('v',Math.sqrt(B*(M+m))/m,T`v=\dfrac{\sqrt{3(M+m)\nu R\Delta T}}m`);
+  if(target==='dT')set('dT',m*m*p.v*p.v/(3*(M+m)*nu*R),T`\Delta T=\dfrac{m^2v^2}{3(M+m)\nu R}`);
+  if(target==='M')set('M',(m*m*p.v*p.v/positive(B)-m)*1000,T`M=\dfrac{m^2v^2}{3\nu R\Delta T}-m`);
+  if(target==='m')set('m',(B+Math.sqrt(B*B+4*p.v*p.v*B*M))/(2*p.v*p.v)*1000,T`m=\dfrac{B+\sqrt{B^2+4v^2BM}}{2v^2}`);
+  if(['nu','V0','p0','T0'].includes(target)){
+   nu=m*m*p.v*p.v/(3*(M+m)*R*p.dT);
+   if(target==='nu'){set('nu',nu,T`\nu=\dfrac{m^2v^2}{3(M+m)R\Delta T}`);p.V0=nu*R*temp/p.p0;locks.push('V0');}
+   if(target==='V0')set('V0',nu*R*temp/p.p0,T`V_0=\dfrac{m^2v^2T_0}{3(M+m)p_0\Delta T}`);
+   if(target==='p0')set('p0',nu*R*temp/p.V0,T`p_0=\dfrac{m^2v^2T_0}{3(M+m)V_0\Delta T}`);
+   if(target==='T0')set('T0',p.p0*p.V0/(nu*R),T`T_0=\dfrac{3(M+m)p_0V_0\Delta T}{m^2v^2}`);
+  }
+  if(!amount){p.nu=nu;locks.push('nu');}
+  note=(target==='m'?'B = 3νRΔT. ':'')+'Гелий и аргон — одноатомные идеальные газы. В формулах массы в кг, T₀ в К, p₀ в Па, V₀ в м³.'+(target==='nu'?' Объём для анимации найден из p₀V₀ = νRT₀.':amount?' Объём найден из заданного ν.':' ν рассчитано из p₀V₀ = νRT₀.');
+ }
+ }catch(e){error=e.message;locks.push(target);}
+ return {locks:[...new Set(locks)],formula,note,error,target};
+}
+if(typeof module!=='undefined')module.exports={configureModels,solveSelection,solveThreeBodies};
+
+configureModels(MODELS);
+const ID='18878',MODEL=MODELS[ID];
+const fmt = (x, d = 2) => {
+  let s = (Math.round(x * 10 ** d) / 10 ** d).toFixed(d);
+  if (s.includes('.')) s = s.replace(/0+$/, '').replace(/\.$/, '');
+  if (s === '-0') s = '0';
+  return s.replace('.', ',').replace('-', '−');
+};
+const fx = (x, d) => x.toFixed(d).replace('.', ',');
+const fv = x => fmt(x, Math.abs(x) >= 100 ? 0 : Math.abs(x) >= 10 ? 1 : Math.abs(x) >= .1 || x === 0 ? 2 : 3);
+const tn = x => fv(x).replace(',', '{,}').replace('−', '-');
+const gr = m => fmt(m * 1000, 0);
+
+/* ══════ [ОБЩЕЕ] формулы: MathJax (SVG), а пока он не загрузился — простой текстовый вид.
+   В plainOf при необходимости добавь замены для своих команд TeX. ══════ */
+let mjOK = false;
+const texEls = new Set();
+function plainOf(s) {
+  return s.replace(/\\(?:mathrm|operatorname)\{([^}]*)\}/g,'$1').replace(/\\parallel/g,'∥').replace(/\\nu/g,'ν').replace(/\\(?:min|max|arcsin)/g,s=>s.slice(1)).replace(/\\(?:quad|qquad)/g,' ').replace(/\\alpha/g,'α').replace(/\\mu/g,'μ').replace(/\\varphi/g,'φ').replace(/\\Delta/g,'Δ').replace(/\\ge/g,'≥').replace(/\\to/g,'→').replace(/\\cdot/g,'·').replace(/\\left|\\right/g,'').replace(/\\(?:sin|cos)/g,s=>s.slice(1)).replace(/\\d?frac\{([^{}]*)\}\{([^{}]*)\}/g, '($1)/($2)').replace(/\\vec\s*/g, '')
+    .replace(/\\sqrt/g, '√').replace(/\\text\{([^}]*)\}/g, '$1').replace(/\\le/g, '≤')
+    .replace(/\\[,;! ]/g, ' ').replace(/\{,\}/g, ',').replace(/\^2/g, '²')
+    .replace(/_x/g, 'ₓ').replace(/_\{?([^{}\s]+)\}?/g, '$1').replace(/[{}]/g, '').replace(/\s+/g, ' ').trim();
+}
+function renderTex(el) {
+  if (mjOK) { try { el.replaceChildren(MathJax.tex2svg(el._src, {display: false})); return; } catch (e) {} }
+  el.textContent = plainOf(el._src);
+}
+function setTex(el, src) {
+  if (el._mode === 'tex' && el._src === src) return;
+  el._mode = 'tex'; el._src = src; texEls.add(el); renderTex(el);
+}
+function mjReady() {
+  if (mjOK) return;
+  mjOK = true;
+  try { document.head.appendChild(MathJax.svgStylesheet()); } catch (e) {}
+  texEls.forEach(renderTex);
+  dirty = true;
+}
+function setText(el, t) { if (el._t !== t) { el._t = t; el.textContent = t; } }
+
+
+function seg(id, cb) {
+  const box = $(id);
+  box.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    box.querySelectorAll('button').forEach(x => x.setAttribute('aria-checked', x === b ? 'true' : 'false'));
+    cb(b.dataset.v); dirty = true;
+  });
+}
+
+function slider(sp, val) {
+  const el = sp.el, v = val * sp.k;
+  el.min = Math.min(sp.lo, +v.toFixed(4)); el.max = v > sp.hi ? Math.ceil(v * 1.1) : sp.hi;
+  if (Math.abs(+el.value - v) > 1e-9) el.value = v;
+  el.style.setProperty('--p', clamp((v - el.min) / ((el.max - el.min) || 1) * 100, 0, 100).toFixed(2) + '%');
+  setText(sp.out, sp.show(val));
+}
+
+let C = {};
+function readTokens() {
+  const cs = getComputedStyle(document.documentElement), tk = n => cs.getPropertyValue(n).trim();
+  C = {ink: tk('--ink'), ink2: tk('--ink-2'), ink3: tk('--ink-3'), surface: tk('--surface'), green: tk('--green'), greenHi: tk('--green-hi'),
+    greenLo: tk('--green-lo'), greenText: tk('--green-text'), orange: tk('--orange'), orangeInk: tk('--orange-ink'), violet: tk('--violet'), violetHi: tk('--violet-hi'),
+    violetLo: tk('--violet-lo'), violetInk: tk('--violet-ink'), slabA: tk('--slab-a'), slabB: tk('--slab-b'), slabEdge: tk('--slab-edge'), hair: tk('--hair'), thumb: tk('--thumb'), shadow: tk('--cv-shadow')};
+  C.font = getComputedStyle(document.body).fontFamily;
+  dirty = true;
+}
+matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readTokens);
+new MutationObserver(readTokens).observe(document.documentElement, {attributes: true, attributeFilter: ['data-theme']});
+
+
+function rr(c, x, y, w, h, r) {
+  r = Math.min(r, w / 2, h / 2);
+  c.beginPath(); c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+}
+function arrow(c, x1, y1, x2, y2, color, w = 3.5, head = 13) {
+  const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy); if (len < 1.5) return;
+  const ux = dx / len, uy = dy / len, h = Math.min(head, len * .75), hw = h * .44;
+  c.strokeStyle = color; c.fillStyle = color; c.lineWidth = w; c.lineCap = 'round'; c.lineJoin = 'round';
+  c.beginPath(); c.moveTo(x1, y1); c.lineTo(x2 - ux * h * .6, y2 - uy * h * .6); c.stroke();
+  c.beginPath(); c.moveTo(x2, y2); c.lineTo(x2 - ux * h - uy * hw, y2 - uy * h + ux * hw);
+  c.lineTo(x2 - ux * h * .72, y2 - uy * h * .72); c.lineTo(x2 - ux * h + uy * hw, y2 - uy * h - ux * hw); c.closePath();
+  c.lineWidth = 1; c.stroke(); c.fill();
+}
+const ANCH = {c: '-50%', l: '0', r: '-100%'};
+function place(el, x, y, show = true, anchor = 'c') {
+  if (!show) { if (!el.hidden) el.hidden = true; return; }
+  if (el.hidden) el.hidden = false;
+  el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) translate(${ANCH[anchor]},-50%)`;
+}
+/* Подписи ставятся по очереди: каждая берёт первое место из своего списка, где не задевает уже поставленные. */
+let taken = [];
+const block = (l, t_, r, b) => taken.push({l, t: t_, r, b});
+const around = (x, y, d) => block(x - d, y - d, x + d, y + d);
+function put(el, cands, show = true, h = 27) {
+  if (!show) { place(el, 0, 0, false); return; }
+  if (el.hidden) el.hidden = false;
+  const w = el.offsetWidth; let pick = null;
+  for (const [x, y, an] of cands) {
+    const l = an === 'c' ? x - w / 2 : an === 'l' ? x : x - w, r = {l, t: y - h / 2, r: l + w, b: y + h / 2};
+    if (r.l < 4 || r.r > W - 4 || r.t < 4 || r.b > H - 4) continue;
+    if (!pick) pick = [x, y, an, r];
+    if (!taken.some(o => r.l < o.r + 3 && r.r > o.l - 3 && r.t < o.b + 2 && r.b > o.t - 2)) { pick = [x, y, an, r]; break; }
+  }
+  if (!pick) { const [x, y] = cands[0]; pick = [clamp(x, w / 2 + 6, W - w / 2 - 6), clamp(y, 18, H - 18), 'c', null]; }
+  place(el, pick[0], pick[1], true, pick[2]);
+  if (pick[3]) taken.push(pick[3]); else around(pick[0], pick[1], w / 2);
+}
+
+function ball(c, x, y, r, hi, mid, lo, sq = 1) {
+  c.save(); c.translate(x, y); c.scale(1, sq);
+  c.shadowColor = C.shadow; c.shadowBlur = 10 * dpr; c.shadowOffsetY = 4 * dpr;
+  const g = c.createRadialGradient(-r * .35, -r * .4, r * .1, 0, 0, r); g.addColorStop(0, hi); g.addColorStop(.55, mid); g.addColorStop(1, lo);
+  c.fillStyle = g; c.beginPath(); c.arc(0, 0, r, 0, TAU); c.fill();
+  c.restore();
+}
+
+function knobAt(c, x, y, r, color, glyph) {
+  c.save(); c.shadowColor = C.shadow; c.shadowBlur = 9 * dpr; c.shadowOffsetY = 3 * dpr;
+  c.fillStyle = C.thumb; c.beginPath(); c.arc(x, y, r, 0, TAU); c.fill(); c.restore();
+  c.strokeStyle = color; c.lineWidth = 2; c.beginPath(); c.arc(x, y, r - 1, 0, TAU); c.stroke();
+  c.fillStyle = color; c.strokeStyle = color; c.lineWidth = 1.6; c.lineCap = 'round'; c.lineJoin = 'round';
+  if (glyph === 'v') {                                   // двойная стрелка вверх-вниз
+    c.beginPath(); c.moveTo(x, y - 4.5); c.lineTo(x, y + 4.5); c.moveTo(x - 3, y - 2); c.lineTo(x, y - 5); c.lineTo(x + 3, y - 2); c.moveTo(x - 3, y + 2); c.lineTo(x, y + 5); c.lineTo(x + 3, y + 2); c.stroke();
+  } else if (glyph === '+') { c.beginPath(); c.moveTo(x - 3.5, y); c.lineTo(x + 3.5, y); c.moveTo(x, y - 3.5); c.lineTo(x, y + 3.5); c.stroke(); }
+  else { c.beginPath(); c.arc(x, y, 3, 0, TAU); c.fill(); }
+}
+const niceStep = x => { const e = Math.pow(10, Math.floor(Math.log10(x))), m = x / e; return (m <= 1 ? 1 : m <= 2 ? 2 : m <= 5 ? 5 : 10) * e; };
+
+
+const tin = $('time'), tlm = $('tlm');
+let tHold = false, marksKey = '';
+let tMarks = [];
+function seek(k) { if (phase === 'rewind') return; t = clamp(k, 0, 1) * PL.tEnd; phase = t <= 0 ? 'idle' : t >= PL.tEnd ? 'done' : 'pause'; refresh(); }
+tin.addEventListener('input', () => {
+  let k = +tin.value / 1000;
+  const near = 9 / Math.max(60, tin.clientWidth - 24);                     // «магнит» в 9 px: легко остановиться точно на главном моменте
+  if (tHold) for (const m of tMarks) if (m.key && Math.abs(k - m.x) < near) k = m.x;
+  seek(k);
+});
+tlm.addEventListener('click', e => { const el = e.target.closest('.tm'); if (el) seek(+el.dataset.k); });     // щелчок по подписи — переход к этому моменту
+tin.addEventListener('pointerdown', () => { tHold = true; });
+for (const ev of ['pointerup', 'pointercancel']) addEventListener(ev, () => { if (tHold) { tHold = false; dirty = true; } });      // бегунок встаёт точно на момент
+function marks(list) {                                  // [{x: доля шкалы, text, key}]
+  const wide = tlm.clientWidth - 24, key = JSON.stringify(list) + wide; if (key === marksKey) return; marksKey = key; tMarks = list;
+  const first = list.length > 1 ? list[0] : null, gap = first ? (1 - first.x) * wide : 1e9;        // подписи не должны наезжать друг на друга
+  tlm.replaceChildren(...list.map((m, i) => {
+    const el = document.createElement('span'), last = i === list.length - 1;
+    el.className = 'tm' + (m.key ? ' key' : '') + (last ? ' end' : m.x * wide < 44 ? ' start' : gap < 150 ? ' left' : '');
+    el.style.setProperty('--x', m.x.toFixed(4)); el.dataset.k = m.x;
+    const b = document.createElement('b'); b.textContent = last && gap < 60 ? '' : last && gap < 110 ? m.short : m.text;
+    el.append(document.createElement('i'), b); return el;
+  }));
+}
+function syncTime() {
+  const k = PL.tEnd > 0 ? t / PL.tEnd : 0;
+  if (!tHold) { const v = Math.round(k * 1000); if (+tin.value !== v) tin.value = v; }
+  tin.style.setProperty('--p', (k * 100).toFixed(2) + '%'); tin.disabled = phase === 'rewind';
+}
+
+
+function setParam(k, val) { P[k] = val; restart(); }
+function restart() { t = 0; phase = 'idle'; rw = null; refresh(); }
+function onPlay() {
+  if (phase === 'rewind') return;
+  if (phase === 'done' || t >= PL.tEnd) { t = 0; phase = 'run'; }
+  else phase = phase === 'run' ? 'pause' : 'run';
+  lastNow = null; refresh();
+}
+function rewind() {
+  if (phase === 'rewind' || (t === 0 && phase !== 'run')) return;
+  rw = {from: t, t0: performance.now(), dur: reduced ? 0 : 480 + 260 * Math.min(1, t)};
+  phase = 'rewind'; refresh();
+}
+
+
+const P=Object.fromEntries(MODEL.rows.map(r=>[r[0],r[3]])),options=Object.fromEntries((MODEL.toggles||[]).map(r=>[r[0],r[2]]));
+let PL=null,cacheKey='',t=0,phase='idle',speed=.5,vecMode='vel',rw=null,lastNow=null,dirty=true,used=Object.fromEntries(MODEL.rows.map(r=>[r[0],false])),hover='',drag=null;
+const SP=Object.fromEntries(MODEL.rows.map(([k,name,sym,def,lo,hi,step,unit])=>[k,{el:$('p'+k),out:$('o'+k),k:1,lo,hi,step,unit,show:v=>fmt(v,4)+(unit?' '+unit:'')}]));
+let target=MODEL.target||'',calc={locks:[],formula:'',note:'',error:''};
+function enforce(){
+ const next={...P};calc=solveSelection(ID,next,target,options);if(!calc.error)Object.assign(P,next);
+}
+function locked(k){return calc.locks.includes(k);}
+for(const k in SP)SP[k].el.addEventListener('input',e=>{
+ if(ID==='34611'&&options.equal&&k==='m2')P.m1=+e.target.value;
+ setParam(k,+e.target.value);
+});
+for(const [k] of MODEL.toggles||[])$('toggle_'+k).addEventListener('click',()=>{options[k]=!options[k];$('toggle_'+k).setAttribute('aria-pressed',options[k]);restart();});
+if($('target'))$('target').addEventListener('change',e=>{target=e.target.value;restart();});
+if($('attachment'))$('attachment').addEventListener('change',e=>{options.pullTop=e.target.value==='top';restart();});
+if($('basis'))$('basis').addEventListener('change',e=>{options.basis=e.target.value;restart();});
+document.querySelectorAll('.tex[data-tex]').forEach(el=>setTex(el,el.dataset.tex));
+seg('speed',v=>{speed=+v;});seg('vec',v=>{vecMode=v;});$('play').addEventListener('click',onPlay);$('reset').addEventListener('click',rewind);
+function plan(){enforce();const key=JSON.stringify([P,target,options,calc.error]);if(cacheKey!==key||!PL){PL=calc.error?{valid:false,error:calc.error,summary:'Измени исходные данные или выбери другую искомую величину.',tEnd:1,events:[],groups:[],bounds:[0,4,0,3],state:()=>({})}:MODEL.solve({...P});cacheKey=key;}return PL;}
+function state(time){return PL.state(clamp(time,0,PL.tEnd));}
+function refresh(){
+ PL=plan();
+ if(!drag)VT=fitView();
+ for(const k in SP){const sp=SP[k],v=Number.isFinite(P[k])?P[k]:0;sp.el.min=Math.min(sp.lo,v);sp.el.max=Math.max(sp.hi,v*1.05);slider(sp,v);sp.el.disabled=locked(k);}
+ if($('calcNote')){setText($('calcNote'),calc.note);setText($('calcError'),calc.error);if(ID==='34611')$('target').disabled=!options.together;if(ID==='112703')$('basis').disabled=['nu','V0','p0','T0'].includes(target);if(calc.error&&SP[target])setText(SP[target].out,'—');}
+ setText($('balTxt'),PL.summary.replaceAll('{,}',','));
+ const bt=phase==='run'?'Пауза':phase==='done'?'Ещё раз':t===0?'Пуск':'Продолжить';setText($('playTxt'),bt);
+ $('icoPause').toggleAttribute('hidden',bt!=='Пауза');$('icoAgain').toggleAttribute('hidden',bt!=='Ещё раз');$('icoPlay').toggleAttribute('hidden',bt==='Пауза'||bt==='Ещё раз');
+ $('play').disabled=phase==='rewind'||!PL.valid;$('reset').disabled=(t===0&&phase!=='run')||phase==='rewind';
+ marks(PL.events.map(e=>({x:e.t/PL.tEnd,text:e.label+' '+fv(e.t)+' '+(MODEL.timeUnit||'с'),short:fv(e.t)+' '+(MODEL.timeUnit||'с'),key:e.key})));
+ formulas();dirty=true;
+}
+function formulas(){for(let i=0;i<4;i++){let group=PL.groups[i];$('group'+i).hidden=!group;if(!group)continue;setText($('heading'+i),group[0]);for(let j=0;j<3;j++){const el=$('f'+i+'_'+j);el.hidden=!group[j+1];if(group[j+1])setTex(el,group[j+1]);}}setText($('fnote'),PL.error||'');if($('solveGroup')){$('solveGroup').hidden=!calc.formula||!!calc.error;if(calc.formula&&!calc.error){const v=ID==='112703'&&['M','m'].includes(target)?P[target]/1000:ID==='112703'&&target==='V0'?P.V0/1000:ID==='112703'&&target==='p0'?P.p0*1000:P[target],u=ID==='112703'&&['M','m'].includes(target)?'кг':ID==='112703'&&target==='V0'?'м³':ID==='112703'&&target==='p0'?'Па':SP[target]?.unit||'';setTex($('fSolve'),calc.formula+'='+String(+v.toPrecision(6)).replace('.', '{,}')+(u?'\\ \\text{'+u+'}':''));setText($('solveNote'),calc.note);}}}
+function playbackRate(){return ID==='18878'&&options.fast&&PL.valid?1+19*Math.exp(-state(t).q/.065):1;}
+const stage=$('stage'),cv=$('scene'),ctx=cv.getContext('2d');
+let W=0,H=0,dpr=1,small=false,RB=12,geo={},IR={x:0,y:0,w:0,h:0},V=null,VT={s:1,ox:0,gy:0};
+const heightScale=ID==='18878'?4:1;
+const X=x=>V.ox+x*V.s,Y=y=>V.gy-y*V.s*heightScale;
+function fitView(){const b=(PL||plan()).bounds,ml=small?28:40,mr=small?28:IR.w+44,mt=100,mb=small?IR.h+62:64;const s=Math.max(.001,Math.min((W-ml-mr)/(b[1]-b[0]),(H-mt-mb)/((b[3]-b[2])*heightScale)));return{s,ox:ml-b[0]*s+Math.max(0,(W-ml-mr-(b[1]-b[0])*s)/2),gy:H-mb+b[2]*s*heightScale};}
+function resize(){let r=stage.getBoundingClientRect();if(r.width<2||r.height<2)return;dpr=Math.min(window.devicePixelRatio||1,2);W=r.width;H=r.height;small=W<520;RB=small?10:12;IR=small?{x:8,y:H-8-120,w:W-16,h:120}:{x:W-14-228,y:78,w:228,h:190};cv.width=Math.max(1,Math.round(W*dpr));cv.height=Math.max(1,Math.round(H*dpr));V=null;refresh();}
+new ResizeObserver(resize).observe(stage);
+const L_=Array.from({length:60},(_,i)=>$('l'+i)),tx=el=>el.querySelector('.tex'),vl=el=>el.querySelector('.val');let li=0,handles=[],pending=[];
+function label(tex,value,x,y,cls='dim',anchor='c',optional=false){if(li>=60)return;const el=L_[li++];el.className='lab '+cls;setTex(tx(el),tex);setText(vl(el),value);pending.push({el,x,y,anchor,optional});}
+function line(x1,y1,x2,y2,col=C.ink2,w=1.5,dash=[]){ctx.save();ctx.strokeStyle=col;ctx.lineWidth=w;ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.restore();}
+function worldLine(x1,y1,x2,y2,col=C.ink2,w=1.5,dash=[]){line(X(x1),Y(y1),X(x2),Y(y2),col,w,dash);}
+function rect(x,y,w,h,col=C.slabA,edge=C.slabEdge){rr(ctx,x,y,w,h,4);const g=ctx.createLinearGradient(x,y,x,y+h);g.addColorStop(0,col);g.addColorStop(1,col===C.slabA?C.slabB:col);ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=edge;ctx.lineWidth=1.2;ctx.stroke();}
+function body(x,y,w,h,col,sym,massKey){const px=X(x),py=Y(y),sw=Math.max(28,w*V.s),sh=Math.max(28,h*V.s);rect(px-sw/2,py-sh,sw,sh,col,'#101b16');label(sym,'',px,py-sh/2,'body-label');around(px,py-sh/2,Math.min(sw,sh)/2);if(massKey)massHandle(massKey,px,py-sh);return{px,py:py-sh/2,w:sw,h:sh};}
+function puck(x,y,r=19,tilt=0){ctx.save();ctx.translate(x,y);ctx.rotate(tilt);const h=9,ry=r*.42;ctx.lineWidth=1.3;ctx.strokeStyle='#102519';ctx.fillStyle=C.greenLo;ctx.beginPath();ctx.ellipse(0,0,r,ry,0,0,Math.PI);ctx.lineTo(-r,-h);ctx.ellipse(0,-h,r,ry,0,Math.PI,0,true);ctx.closePath();ctx.fill();ctx.stroke();ctx.fillStyle=C.green;ctx.beginPath();ctx.ellipse(0,-h,r,ry,0,0,TAU);ctx.fill();ctx.stroke();ctx.strokeStyle=C.greenHi;ctx.globalAlpha=.45;ctx.beginPath();ctx.ellipse(0,-h-1,r-3,ry-2,0,Math.PI,1.8*Math.PI);ctx.stroke();ctx.restore();around(x,y-6,r);}
+function handle(k,x,y,glyph='+',axis='y',gain=null,color=C.ink2){if(!SP[k]||locked(k))return;const spec=SP[k];handles.push({k,x,y,axis,gain:gain||((spec.hi-spec.lo)/150)});if(t===0){knobAt(ctx,x,y,9,color,glyph);if(!used[k]&&!reduced&&!drag){ctx.save();ctx.globalAlpha=.3;ctx.strokeStyle=color;ctx.beginPath();ctx.arc(x,y,13+6*((performance.now()/1300)%1),0,TAU);ctx.stroke();ctx.restore();}}around(x,y,12);}
+function massHandle(k,x,y){if(t>0||locked(k))return;const sp=SP[k],len=22+18*clamp((P[k]-sp.lo)/(sp.hi-sp.lo),0,1),xx=x-14,yy=y-len;line(x,y,xx,yy,C.ink3);handle(k,xx,yy,'+','y',null,k==='M'?C.green:C.violet);}
+function vector(x,y,dx,dy,tex,color=C.orange,scale=1,stable=false){const len=Math.hypot(dx,dy);if(len<1e-9)return;const ex=x+dx*scale,ey=y+dy*scale,off=stable?35:18;arrow(ctx,x,y,ex,ey,color,3.4,12);label(tex,'',(x+ex)/2+dy/len*off,(y+ey)/2-dx/len*off,(color===C.orange?'f':color===C.violet?'b2':'b1')+(stable?' fixed-label':''),'c',!stable);}
+function dimension(x1,y1,x2,y2,tex,value,cls='dim'){const mx=(x1+x2)/2,my=(y1+y2)/2;arrow(ctx,mx,my,x1,y1,C.ink2,1.2,6);arrow(ctx,mx,my,x2,y2,C.ink2,1.2,6);const vertical=Math.abs(x2-x1)<5;label(tex,'= '+fv(value)+' м',vertical?mx+8:mx,vertical?my:my+18,cls,vertical?'l':'c');}
+function ruler(y,xmin,xmax){line(X(xmin),Y(y),X(xmax),Y(y),C.ink3);const step=niceStep(65/V.s);for(let n=Math.ceil(xmin/step);n*step<=xmax;n++){const x=X(n*step);line(x,Y(y)+5,x,Y(y)+10,C.ink3,1);ctx.fillStyle=C.ink2;ctx.font=`11px ${C.font}`;ctx.textAlign='center';ctx.fillText(fmt(n*step,2),x,Y(y)+25);}}
+function pulley(x,y,r=.15){ctx.fillStyle=C.surface;ctx.strokeStyle=C.ink2;ctx.lineWidth=2;ctx.beginPath();ctx.arc(X(x),Y(y),Math.max(7,r*V.s),0,TAU);ctx.fill();ctx.stroke();ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(X(x),Y(y),2.5,0,TAU);ctx.fill();}
+function path(points,col=C.ink3,dash=[]){ctx.save();ctx.strokeStyle=col;ctx.lineWidth=dash.length?2:2.6;ctx.setLineDash(dash);ctx.beginPath();points.forEach((p,i)=>ctx[i?'lineTo':'moveTo'](X(p.x),Y(p.y)));ctx.stroke();ctx.restore();}
+function trace(get,col){path(Array.from({length:70},(_,i)=>get(PL.tEnd*i/69)),col,[5,6]);if(t>0)path(Array.from({length:50},(_,i)=>get(t*i/49)),col);}
+function inset(title,entries,triangle=false){const r=IR;ctx.save();ctx.shadowColor=C.shadow;ctx.shadowBlur=14*dpr;ctx.shadowOffsetY=4*dpr;rect(r.x,r.y,r.w,r.h,C.surface,C.hair);ctx.restore();ctx.fillStyle=C.ink2;ctx.font=`600 12px ${C.font}`;ctx.textAlign='left';ctx.fillText(title,r.x+14,r.y+22);
+ const max=Math.max(...entries.map(e=>Math.hypot(e.x,e.y)),1e-9),vertical=!triangle&&entries.some(e=>e.y!==0),scale=(triangle?40:vertical?34:small?42:58)/max;
+ if(triangle){const ox=r.x+(small?45:74),oy=r.y+51;let x=ox,y=oy;entries.forEach((e,i)=>{if(i===2){x=ox;y=oy;}const xx=x+e.x*scale,yy=y-e.y*scale;arrow(ctx,x,y,xx,yy,e.color,3,10);label(e.tex,'',(x+xx)/2+(i===1?35:0),(y+yy)/2+(i===0?-14:i===2?25:0),i===2?'bu':i===0?'b1':'b2');x=xx;y=yy;});}
+ else entries.forEach((e,i)=>{const ox=vertical?r.x+(small?48:94)+i*(small?46:65):r.x+(small?68:104),oy=vertical?r.y+76:r.y+45+i*28;arrow(ctx,ox,oy,ox+e.x*scale,oy-e.y*scale,e.color,3,11);label(e.tex,'',vertical?ox-18:r.x+14,vertical?r.y+39:oy,'dim',vertical?'c':'l');});
+ entries.forEach((e,i)=>label(e.name,'= '+fv(e.value)+' '+e.unit,small?r.x+r.w*.54:r.x+16,small?r.y+43+i*23:r.y+r.h-58+i*23,'dim','l'));
+}
+function drawScene(q,now){ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);li=0;handles=[];pending=[];taken=[];block(IR.x-5,IR.y-5,IR.x+IR.w+5,IR.y+IR.h+5);block(0,0,W,80);
+ if(!PL.valid){ctx.fillStyle=C.ink2;ctx.font=`15px ${C.font}`;ctx.fillText('Проверь параметры справа',20,H/2);}else scenes[ID](q);
+ drawPV(q);
+ for(const {el,x,y,anchor,optional}of pending){
+  el.style.color=el.classList.contains('body-label')?C.thumb:'';
+  if(el.classList.contains('body-label')){place(el,x,y,true,anchor);continue;}
+  if(el.classList.contains('fixed-label')){place(el,x,y,true,anchor);continue;}
+  const inInset=x>=IR.x&&x<=IR.x+IR.w&&y>=IR.y&&y<=IR.y+IR.h;
+  if(inInset){place(el,x,y,true,anchor);continue;}
+  const cands=[[x,y,anchor],[x,y-25,anchor],[x,y+25,anchor],[x+18,y-40,'l'],[x-18,y-40,'r']];
+  if(optional){const w=el.offsetWidth||35;if(taken.some(o=>x+w/2>o.l&&x-w/2<o.r&&y+10>o.t&&y-10<o.b)){place(el,0,0,false);continue;}}
+  put(el,cands);
+ }
+ for(let i=li;i<60;i++)place(L_[i],0,0,false);geo={handles};cv._geo=geo;
+}
+const scenes={};
+scenes['27107']=q=>{
+ const p=PL,b=p.bounds,s=q.s,wall=P.D+1.7,r=.15,px=.75-s;
+ ruler(0,b[0],b[1]);worldLine(wall,0,wall,1.5);for(let y=.1;y<1.5;y+=.13)worldLine(wall,y,wall+.1,y+.1,C.ink3,1);
+ const A=body(-s,.01,.6,.95,C.green,'M','M'),B=body(1.1+P.D-q.sm,.01,.4,.43,C.violet,'m','m');
+ const rp=Math.max(7,r*V.s),pcy=B.py-rp,py=(V.gy-pcy)/V.s;
+ line(A.px+A.w/2,pcy,X(px),pcy,C.ink2,3);pulley(px,py,r);line(X(px),pcy-rp,X(wall),pcy-rp);line(X(px),B.py,B.px-B.w/2,B.py);ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(B.px-B.w/2,B.py,2.5,0,TAU);ctx.fill();
+ if(t>0){worldLine(0,1.05,-s,1.05,C.green,2,[5,6]);worldLine(1.1+P.D,.2,1.1+P.D-q.sm,.2,C.violet,2,[5,6]);}
+ dimension(X(0),Y(-.2),X(-s),Y(-.2),'s_M',s);dimension(X(1.1+P.D),Y(-.65),X(1.1+P.D-q.sm),Y(-.65),'s_m',q.sm);
+ const force=vecMode==='vel',k=55/Math.max(P.F,p.Tn*2,1);
+ if(force){vector(A.px-A.w/2,A.py,-P.F,0,'\\vec F',C.orange,k);vector(X(px),Y(py),2*p.Tn,0,'2\\vec T',C.orange,k);vector(B.px,B.py,-p.Tn,0,'\\vec T',C.orange,k);if(t===0)handle('F',A.px-A.w/2-55,A.py,'.','-x',P.F/55||.3,C.orange);}
+ else{const kv=55/Math.max(2*p.a*p.tEnd,1e-9);vector(A.px,A.py-35,-q.v,0,'\\vec v_M',C.green,kv);vector(B.px,B.py-35,-q.vm,0,'\\vec v_m',C.violet,kv);}
+ if(t===0)handle('D',B.px+B.w/2+13,B.py,'.','x',1/V.s,C.violet);
+ inset(force?'Силы на большом бруске':'Скорости перед касанием',force?[{x:-P.F,y:0,tex:'\\vec F',name:'F',value:P.F,unit:'Н',color:C.orange},{x:2*p.Tn,y:0,tex:'2\\vec T',name:'2T',value:2*p.Tn,unit:'Н',color:C.ink}]:[{x:-p.a*p.tEnd,y:0,tex:'\\vec v_M',name:'v_M',value:p.a*p.tEnd,unit:'м/с',color:C.green},{x:-2*p.a*p.tEnd,y:0,tex:'\\vec v_m',name:'v_m',value:2*p.a*p.tEnd,unit:'м/с',color:C.violet}]);
+};
+scenes['34611']=q=>{
+ const p=PL,edge=P.D+.9,by=1,s=q.s;
+ worldLine(-.6,by,edge,by,C.ink2,3);worldLine(edge,by,edge,-P.D-.5,C.ink3,2);
+ for(let xx=-.6;xx<edge;xx+=.16)worldLine(xx,by,xx-.09,by-.09,C.ink3,1);
+ const A=body(s,by,2*P.L,.5,C.green,'M','M'),B=body(q.s1,by+A.h/V.s,.36,.32,C.green,'m_1','m1');
+ const attach=p.top?B:A,rp=Math.max(9,.13*V.s),pcx=X(edge)+rp,pcy=attach.py+rp;
+ ctx.fillStyle=C.surface;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(pcx,pcy,rp,0,TAU);ctx.fill();ctx.stroke();line(X(edge),Y(by),pcx,pcy,C.ink2,2);ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(pcx,pcy,2.5,0,TAU);ctx.fill();
+ const dw=Math.max(30,.27*V.s),dh=Math.max(43,.46*V.s),dx=pcx+rp,dy=Y(.1-q.s2);
+ rect(dx-dw/2,dy,dw,dh,C.green,'#101b16');const D={px:dx,py:dy+dh/2,w:dw,h:dh};label('m_2','',dx,dy+dh/2,'body-label');massHandle('m2',dx,dy);
+ line(attach.px+attach.w/2,attach.py,pcx,attach.py);line(dx,pcy,dx,dy);ctx.fillStyle=C.ink;ctx.beginPath();ctx.arc(attach.px+attach.w/2,attach.py,2.5,0,TAU);ctx.fill();
+ dimension(X(0),Y(.55),X(s),Y(.55),'s_M',s);dimension(dx+48,Y(.1)+dh/2,dx+48,D.py,'s_2',q.s2);
+ label('s_1','= '+fv(q.s1)+' м',X(q.s1),Y(2.0),'b2 chip');if(t===0){handle('D',dx+dw/2+18,D.py,'v','y',1/V.s);}
+ const force=vecMode==='vel',k=55/Math.max(p.Tn,p.f,P.m2*P.g,1);
+ if(force){vector(attach.px+attach.w/2,attach.py,p.Tn,0,'\\vec T',C.orange,k);vector(B.px,B.py,p.top?-p.f:p.f,0,'\\vec F_{тр}',C.orange,k);vector(D.px,D.py,0,-p.Tn,'\\vec T',C.orange,k,true);vector(D.px,D.py,0,P.m2*P.g,'m_2\\vec g',C.orange,k,true);}
+ else{const kv=45/(Math.max(p.a,p.a1)*p.tEnd);vector(A.px,A.py-20,q.v,0,'\\vec v_M',C.green,kv);vector(B.px,B.py-20,q.v1,0,'\\vec v_1',C.violet,kv);vector(D.px,D.py,0,q.v2,'\\vec v_2',C.ink,kv,true);}
+ inset(force?'Подвешенный груз':'Скорости в конце участка',force?[{x:0,y:-P.m2*P.g,tex:'m_2\\vec g',name:'m_2g',value:P.m2*P.g,unit:'Н',color:C.orange},{x:0,y:p.Tn,tex:'\\vec T',name:'T',value:p.Tn,unit:'Н',color:C.ink}]:[{x:p.a*p.tEnd,y:0,tex:'\\vec v_M',name:'v_M',value:p.a*p.tEnd,unit:'м/с',color:C.green},{x:p.a1*p.tEnd,y:0,tex:'\\vec v_1',name:'v_1',value:p.a1*p.tEnd,unit:'м/с',color:C.violet}]);
+};
+scenes['18313']=q=>{
+ const p=PL,available=small?W-54:IR.x-50,cx=40,cy=H-(small?IR.h+70:55),w=available*.7,h=Math.min(160,H-(small?IR.h+190:180)),skew=available*.24;
+ const proj=(x,y)=>({x:cx+w*.25+x/P.D*w*.45+(1-y/P.D)*skew,y:cy-h*.7+y/P.D*h*.65});
+ ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+w,cy);ctx.lineTo(cx+w+skew,cy-h);ctx.lineTo(cx+skew,cy-h);ctx.closePath();ctx.fillStyle=C.slabA;ctx.fill();ctx.strokeStyle=C.slabEdge;ctx.stroke();
+ const start=proj(0,0),end=proj(p.ux*P.D,p.uy*P.D),pos=proj(q.x,q.y);line(start.x,start.y,end.x,end.y,C.green,2,[5,6]);line(start.x,start.y,pos.x,pos.y,C.green,2.6);puck(pos.x,pos.y,19+Math.cbrt(P.m)*2);label('m','',pos.x-27,pos.y-24,'b1');massHandle('m',pos.x,pos.y-21);
+ label('s','= '+fv(q.s)+' м',cx+w/2,cy+28,'dim chip');label('\\alpha','= '+fv(P.alpha)+'°',cx+w,cy-8,'dim');if(t===0)handle('alpha',cx+w+skew,cy-h,'v','y');
+ const force=vecMode==='vel',scale=65/Math.max(p.drive,1);
+ if(force){
+  const ox=pos.x,oy=pos.y-8,k=78/Math.max(P.m*P.g,p.drive,1),a=P.alpha*Math.PI/180,ss=Math.sin(a),gx=P.m*P.g;
+  arrow(ctx,ox,oy,ox+P.F*k,oy,C.orange,3,10);label('\\vec F','',ox+P.F*k+14,oy-19,'f fixed-label');
+  arrow(ctx,ox,oy,ox,oy+gx*k,C.green,3,10);label('m\\vec g','',ox+25,oy+gx*k-3,'b1 fixed-label');
+  arrow(ctx,ox,oy,ox-.35*gx*ss*ss*k,oy+(ss*ss*.9-1)*gx*k,C.green,3,10);label('\\vec N','',ox+17,oy+(ss*ss*.9-1)*gx*k-12,'b1 fixed-label');
+  const fx=(-p.fr*p.ux+p.fr*p.uy*.35)*k,fy=-p.fr*p.uy*.9*k;
+  arrow(ctx,ox,oy,ox+fx,oy+fy,C.violet,3,10);label('\\vec F_{тр}','',ox+fx-26,oy+fy-7,'b2 fixed-label');
+  if(t===0)handle('F',ox+P.F*k,oy,'.','x',1/k,C.orange);
+ }
+ else vector(pos.x,pos.y,(p.ux-.35*p.uy)*q.v,p.uy*.9*q.v,'\\vec v',C.green,55/Math.max(p.a*p.tEnd,1));
+ inset(force?'В плоскости склона':'Скорость и её компоненты',force?[{x:P.F,y:0,tex:'\\vec F',name:'F',value:P.F,unit:'Н',color:C.green},{x:0,y:-p.down,tex:'m\\vec g_{\\parallel}',name:'mg\\sin\\alpha',value:p.down,unit:'Н',color:C.violet},{x:P.F,y:-p.down,tex:'\\vec R',name:'R',value:p.drive,unit:'Н',color:C.ink}]:[{x:p.ux*p.a*p.tEnd,y:0,tex:'\\vec v_x',name:'v_x',value:p.ux*p.a*p.tEnd,unit:'м/с',color:C.green},{x:0,y:-p.uy*p.a*p.tEnd,tex:'\\vec v_y',name:'v_y',value:p.uy*p.a*p.tEnd,unit:'м/с',color:C.violet},{x:p.ux*p.a*p.tEnd,y:-p.uy*p.a*p.tEnd,tex:'\\vec v',name:'v',value:p.a*p.tEnd,unit:'м/с',color:C.ink}],true);
+};
+function trackScene(q,hill){const p=PL,scale=hill?P.H:Math.max(P.H,P.h),shift=q.shift||0,b=p.bounds;ruler(-.1*scale,b[0],b[1]);
+ if(hill){ctx.fillStyle=C.ink2;ctx.font=`11px ${C.font}`;ctx.textAlign='left';ctx.fillText('Схема · вертикаль ×4',X(b[0]),Y(-.1*scale)+43);}
+ const track=Array.from({length:180},(_,i)=>{const z=p.curve(i/179);return{x:z.x+shift,y:z.y};});
+ if(hill){ctx.beginPath();ctx.moveTo(X(track[0].x),Y(-.08*scale));track.forEach(z=>ctx.lineTo(X(z.x),Y(z.y)));ctx.lineTo(X(track.at(-1).x),Y(-.08*scale));ctx.closePath();const g=ctx.createLinearGradient(0,Y(P.H),0,Y(0));g.addColorStop(0,C.slabA);g.addColorStop(1,C.slabB);ctx.fillStyle=g;ctx.fill();ctx.strokeStyle=C.slabEdge;ctx.stroke();}
+ else {rect(X(shift)-8,Y(0),3.3*p.xscale*V.s+16,12,C.slabA);ctx.save();ctx.strokeStyle=C.ink2;ctx.lineWidth=19;ctx.lineCap='round';ctx.lineJoin='round';ctx.beginPath();track.forEach((z,i)=>ctx[i?'lineTo':'moveTo'](X(z.x),Y(z.y)));ctx.stroke();ctx.strokeStyle=C.surface;ctx.lineWidth=15;ctx.stroke();ctx.strokeStyle=C.ink3;ctx.globalAlpha=.22;ctx.lineWidth=10;ctx.stroke();ctx.restore();}
+ trace(tt=>{const z=p.state(tt);return{x:z.x,y:z.y};},C.green);
+ const radius=hill?17:6.5,ballY=Y(q.y);if(hill){const tangent=p.curve(q.q);puck(X(q.x),ballY,radius,Math.atan(-tangent.dy*heightScale/tangent.dx));}else ball(ctx,X(q.x),ballY,radius,C.greenHi,C.green,C.greenLo,1);label('m','',X(q.x)+22,ballY-23,'b1');massHandle('m',X(q.x),ballY-radius-9);
+ const middle=hill?-p.span/2+shift:1.65*p.xscale+shift;label('M','',X(middle),hill?Y(-.02*scale)-6:Y(0)+6,hill?'b2':'body-label');massHandle('M',X(middle),Y(-.02*scale)-12);
+ const first=p.curve(0),last=p.curve(1);dimension(X(first.x+shift)+18,Y(0),X(first.x+shift)+18,Y(P.H),'H',P.H);dimension(X(last.x+shift)-18,Y(0),X(last.x+shift)-18,Y(P.h),'h',P.h);
+ if(t===0){handle('H',X(first.x),Y(P.H),'v','y',1/(V.s*heightScale));handle('h',X(last.x),Y(P.h),'v','y',1/(V.s*heightScale));}
+ const mom=vecMode==='mom',kv=48/Math.max(p.V||p.v,p.u,1),km=mom?kv/Math.max(P.m,P.M):kv;
+ vector(X(q.x),ballY,q.vx*(mom?P.m:1),-q.vy*heightScale*(mom?P.m:1),mom?'\\vec p_m':'\\vec v',C.green,mom?km:kv);vector(X(middle),Y(-.02*scale)+18,q.u*(mom?P.M:1),0,mom?'\\vec p_M':'\\vec u',C.violet,mom?km:kv);
+ inset(hill?'На низкой вершине':'При вылете из трубки',[{x:-(p.V||p.v)*(mom?P.m:1),y:0,tex:mom?'\\vec p_m':'\\vec V',name:mom?'p_m':'V',value:(p.V||p.v)*(mom?P.m:1),unit:mom?'кг·м/с':'м/с',color:C.green},{x:p.u*(mom?P.M:1),y:0,tex:mom?'\\vec p_M':'\\vec u',name:mom?'p_M':'u',value:p.u*(mom?P.M:1),unit:mom?'кг·м/с':'м/с',color:C.violet}]);
+}
+scenes['149702']=q=>trackScene(q,false);scenes['18878']=q=>trackScene(q,true);
+scenes['112703']=q=>{
+ const p=PL,cy=H-(small?IR.h+100:100),left=35,right=small?W-35:IR.x-35,width=right-left,l=p.length,scale=width/(l+P.d+.2*l),end=left+l*scale,piston=left+l*q.z*scale,top=cy-90;
+ rect(left-9,top-9,l*scale+22,116,C.slabA);rect(left,top,l*scale,98,C.surface);ctx.save();ctx.globalAlpha=.12;rect(left,top,Math.max(0,piston-left),98,C.green);ctx.restore();
+ for(let i=0;i<25;i++){const seed=(i*.618033)%1,xx=left+7+(piston-left-14)*seed,yy=top+10+78*((i*.41421+(t/1000)*Math.sqrt(q.T)*3)%1);ctx.fillStyle=C.green;ctx.beginPath();ctx.arc(xx,yy,2,0,TAU);ctx.fill();}
+ rect(piston-5,top,10,98,C.violet);const bullet=q.ph==='bullet'?left+q.x*scale:piston;rect(bullet-6,cy-47,12,10,C.green);
+ label('M','',piston,top-17,'b2');label('m','',bullet,cy-26,'b1');label('T','= '+fv(q.T)+' К',(left+piston)/2,top+28,'dim chip');label('V','= '+fv(P.V0*q.z)+' л',(left+piston)/2,top+66,'dim chip');
+ if(t===0){massHandle('M',piston,top);massHandle('m',bullet,cy-48);handle('V0',piston,cy-8,'v','x',P.V0/(l*scale));handle('d',bullet,cy-42,'.','x',1/scale);}
+ line(end,top+105,piston,top+105,C.ink3,1,[5,6]);label('x','= '+fv(l*(1-q.z))+' м',(end+piston)/2,top+132,'dim');
+ const mom=vecMode==='mom';vector(bullet,cy-42,-(q.ph==='bullet'?P.v:q.u)*(mom?(q.ph==='bullet'?p.m:p.m+p.M):1),0,mom?'\\vec p':'\\vec v',C.green,55/(P.v*(mom?p.m:1)));
+ inset('Момент неупругого удара',[{x:-P.v*(mom?p.m:1),y:0,tex:mom?'\\vec p_0':'\\vec v',name:mom?'p_0':'v',value:P.v*(mom?p.m:1),unit:mom?'кг·м/с':'м/с',color:C.green},{x:-p.u*(mom?p.m+p.M:1),y:0,tex:mom?'\\vec p':'\\vec u',name:mom?'p':'u',value:p.u*(mom?p.m+p.M:1),unit:mom?'кг·м/с':'м/с',color:C.ink}]);
+};
+scenes['182269']=q=>{
+ const p=PL,left=small?W*.22:70,width=small?W*.43:Math.max(90,IR.x-110),bottom=H-(small?IR.h+65:58),height=150,piston=bottom-height*q.z;
+ rect(left-7,bottom-height-35,width+14,height+42,C.slabA);rect(left,bottom-height-35,width,height+35,C.surface);ctx.save();ctx.globalAlpha=.12;rect(left,piston,width,bottom-piston,C.violet);ctx.restore();
+ for(let i=0;i<30;i++){ctx.fillStyle=i<12?C.violet:C.ink3;ctx.beginPath();ctx.arc(left+10+(width-20)*((i*.618)%1),piston+10+(bottom-piston-20)*((i*.414+t*.025)%1),2,0,TAU);ctx.fill();}
+ rect(left-3,piston-8,width+6,8,C.ink3);const sandh=4+24*q.mass/P.sand;ctx.beginPath();ctx.moveTo(left+4,piston-9);ctx.lineTo(left+width/2,piston-9-sandh);ctx.lineTo(left+width-4,piston-9);ctx.closePath();ctx.fillStyle=C.orange;ctx.fill();
+ if(q.condensed>0){for(let i=0;i<Math.ceil(q.condensed*20);i++){const xx=i%2?left+width-3:left+3,yy=bottom-8-Math.floor(i/2)*7;ball(ctx,xx,yy,2.7,C.violetHi,C.violet,C.violetLo,1.4);}}
+ label('m','= '+fv(q.mass)+' кг',left+width/2,piston-46,'f chip');label('\\varphi','= '+fv(q.humidity*100)+' %',left+width/2,(piston+bottom)/2-15,'b2 chip');label('V/V_0','= '+fv(q.z),left+width/2,bottom+25,'dim');
+ if(t===0){handle('sand',left+width/2,piston-22,'+','y',.4,C.orange);handle('V0',left+width,piston,'v','y',.01);handle('S',left+width,bottom-20,'.','x',.2);}
+ const force=vecMode==='vel',s=P.S/1e4,up=force?q.pressure*s:q.pressure/1000,down=force?P.p0*1000*s+q.mass*P.g:P.p0;
+ vector(left+width/2,piston+12,0,-up,'\\vec F_{газ}',C.green,50/up);vector(left+width/2,piston-8,0,down,'\\vec F_{внеш}',C.orange,50/up);
+ inset(force?'Силы на поршне':'Давления при насыщении',[{x:0,y:force?up:P.p0/(P.phi/100),tex:force?'\\vec F_{газ}':'p',name:force?'pS':'p',value:force?up:P.p0/(P.phi/100),unit:force?'Н':'кПа',color:C.green},{x:0,y:force?-down:-P.ps,tex:force?'\\vec F_{внеш}':'p_{нас}',name:force?'p_0S+mg':'p_{нас}',value:force?down:P.ps,unit:force?'Н':'кПа',color:C.orange}]);
+};
+function statusOf(q){if(!PL.valid)return['idle','Проверь параметры'];if(ID==='182269')return[q.dew?'stick':'slip',q.dew?'Пар насыщен · появляется роса':'Сжатие без конденсации'];if(ID==='18313'&&!PL.moving)return['idle','Равновесие · сдвига нет'];if(ID==='34611')return[PL.stick?'stick':'slip',PL.stick?'Грузы движутся вместе':'Верхний груз скользит'];if(ID==='112703')return[phase==='done'?'stick':'slip',phase==='done'?'Поршень остановился':q.ph==='bullet'?'Пуля летит к поршню':'Адиабатическое сжатие'];if(ID==='149702')return[phase==='done'?'stick':'slip',phase==='done'?'Шарик достиг земли':q.ph==='tube'?'Шарик внутри трубки':'Шарик вылетел'];return[phase==='done'?'stick':t===0?'idle':'slip',phase==='done'?'Конец выбранного участка':t===0?'Готово к запуску':'Тела движутся'];}
+const pos=(e,el)=>{const r=el.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top};},canGrab=()=>phase!=='run'&&phase!=='rewind';
+function pick(p){return handles.find(h=>Math.hypot(p.x-h.x,p.y-h.y)<20);}
+cv.addEventListener('pointerdown',e=>{if(!canGrab())return;if(t>0){t=0;phase='idle';refresh();draw(performance.now());}const p=pos(e,cv),h=pick(p);if(!h)return;drag={...h,px:p.x,py:p.y,initial:P[h.k]};used[h.k]=true;e.preventDefault();cv.setPointerCapture(e.pointerId);});
+cv.addEventListener('pointermove',e=>{const p=pos(e,cv);if(!drag){cv.style.cursor=canGrab()&&pick(p)?'grab':'default';return;}const d=drag,delta=d.axis==='x'?p.x-d.px:d.axis==='-x'?d.px-p.x:d.py-p.y,sp=SP[d.k];P[d.k]=clamp(Math.round((d.initial+delta*d.gain)/sp.step)*sp.step,sp.lo,sp.hi);refresh();});
+const endDrag=()=>{if(drag){drag=null;refresh();}};cv.addEventListener('pointerup',endDrag);cv.addEventListener('pointercancel',endDrag);
+function drawPV(q){
+ const canvas=$('pvPlot');if(!canvas)return;const box=canvas.getBoundingClientRect();if(box.width<2)return;
+ const d=Math.min(devicePixelRatio||1,2),w=box.width,h=box.height;if(canvas.width!==Math.round(w*d)||canvas.height!==Math.round(h*d)){canvas.width=Math.round(w*d);canvas.height=Math.round(h*d);}
+ const c=canvas.getContext('2d');c.setTransform(d,0,0,d,0,0);c.clearRect(0,0,w,h);if(!PL.valid){setText($('pvState'),PL.error);return;}
+ const gas=ID==='112703',last=PL.state(PL.tEnd),zmin=last.z,pressure=z=>gas?P.p0*Math.pow(z,-5/3):z>=P.phi/100?P.p0/z:P.ps+(P.p0-P.phi/100*P.ps)/z;
+ const left=62,right=w-24,top=27,bottom=h-44,pm=pressure(zmin)*1.12,vm=P.V0*1.12,px=v=>left+(right-left)*v/vm,py=p=>bottom-(bottom-top)*p/pm;
+ c.font=`12px ${C.font}`;c.lineWidth=1;c.textBaseline='middle';
+ const stepP=niceStep(pm/4),stepV=niceStep(vm/4);
+ c.strokeStyle=C.hair;c.fillStyle=C.ink2;
+ for(let v=0;v<=vm;v+=stepV){c.beginPath();c.moveTo(px(v),top);c.lineTo(px(v),bottom);c.stroke();c.textAlign='center';c.fillText(fv(v),px(v),bottom+18);}
+ for(let p=0;p<=pm;p+=stepP){c.beginPath();c.moveTo(left,py(p));c.lineTo(right,py(p));c.stroke();c.textAlign='right';c.fillText(fv(p),left-9,py(p));}
+ arrow(c,left,bottom,right+8,bottom,C.ink2,1.5,7);arrow(c,left,bottom,left,top-12,C.ink2,1.5,7);
+ c.fillStyle=C.ink;c.textAlign='left';c.fillText('p, кПа',left+7,12);c.textAlign='right';c.fillText('V, л',right+8,h-8);
+ const plot=(za,zb,color,dash)=>{c.strokeStyle=color;c.lineWidth=dash.length?2:3;c.setLineDash(dash);c.beginPath();for(let i=0;i<=180;i++){let z=za+(zb-za)*i/180;c[i?'lineTo':'moveTo'](px(P.V0*z),py(pressure(z)));}c.stroke();c.setLineDash([]);};
+ plot(1,zmin,C.ink3,[5,5]);plot(1,q.z,C.green,[]);
+ const dot=(z,color,r=4)=>{c.fillStyle=color;c.beginPath();c.arc(px(P.V0*z),py(pressure(z)),r,0,TAU);c.fill();};dot(1,C.ink3);dot(zmin,C.ink3);
+ if(!gas&&PL.tc<=PL.tEnd){const z=P.phi/100;dot(z,C.orange,5);c.fillStyle=C.orangeInk;c.textAlign='left';c.fillText('Роса',Math.min(right-36,px(P.V0*z)+8),Math.max(top+10,py(pressure(z))-14));}
+ dot(q.z,C.green,6);c.strokeStyle=C.green;c.lineWidth=1;c.setLineDash([3,4]);c.beginPath();c.moveTo(left,py(pressure(q.z)));c.lineTo(px(P.V0*q.z),py(pressure(q.z)));c.lineTo(px(P.V0*q.z),bottom);c.stroke();c.setLineDash([]);
+ // Arrow follows increasing compression: towards smaller V and larger p.
+ const z1=1-(1-zmin)*.4,z2=1-(1-zmin)*.47;arrow(c,px(P.V0*z1),py(pressure(z1)),px(P.V0*z2),py(pressure(z2)),C.green,2,8);
+ setText($('pvState'),`V = ${fv(P.V0*q.z)} л · p = ${fv(pressure(q.z))} кПа · `+(gas?'адиабата, pV⁵ᐟ³ = const':q.dew?'пар насыщен; идёт конденсация':'изотерма до насыщения, pV = const'));
+ canvas.setAttribute('aria-label',`p–V: объём ${fv(P.V0*q.z)} л, давление ${fv(pressure(q.z))} кПа`);
+}
+
+function draw(now) {
+  if (!V) V = {...VT};
+  else if (!reduced) { let moving = false; for (const k of ['s', 'ox', 'gy']) { const d = VT[k] - V[k]; if (Math.abs(d) > (k === 's' ? V.s * .002 : .3)) { V[k] += d * .22; moving = true; } else V[k] = VT[k]; } if (moving) dirty = true; }
+  else V = {...VT};
+  const q = state(t);
+  drawScene(q, now); syncTime();
+  setText($('clock'), fx(t, 2));
+  const [st, txt] = statusOf(q);
+  if ($('pill').dataset.s !== st) $('pill').dataset.s = st;
+  setText($('pillTxt'), txt);
+}
+
+
+const ease = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+function tick(ms) {
+  requestAnimationFrame(tick);
+  const now = ms / 1000, dtReal = lastNow == null ? 0 : Math.min(now - lastNow, .05); lastNow = now;
+  if (phase === 'run') {
+    t += dtReal * speed * playbackRate();
+    if (t >= PL.tEnd) { t = PL.tEnd; phase = 'done'; refresh(); }
+    dirty = true;
+  } else if (phase === 'rewind' && rw) {
+    const k = rw.dur ? clamp((ms - rw.t0) / rw.dur, 0, 1) : 1;
+    t = rw.from * (1 - ease(k)); dirty = true;
+    if (k >= 1) { t = 0; rw = null; phase = 'idle'; refresh(); }
+  }
+  const hints = phase === 'idle' && !reduced && Object.values(used).some(v=>!v);
+  if (dirty || hints) { dirty = false; draw(ms); }
+}
+
+
+readTokens();resize();if(!PL)refresh();
+if(window.MathJax&&MathJax.tex2svg&&MathJax.svgStylesheet)mjReady();else window.__mj=mjReady;
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{readTokens();});requestAnimationFrame(tick);
+})();</script></body></html>
